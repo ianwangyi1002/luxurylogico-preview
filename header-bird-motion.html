@@ -71,45 +71,46 @@ function flyToPosition(){
   if(bodyMotion) bodyMotion.cancel();
   const startX=-Math.min(innerWidth*.30,330);
   const startY=Math.min(innerHeight*.48,400);
-  const duration=5600;
+  const duration=6800;
 
   /* 長弧線接近定位，後半段留給滑翔與自然減速。 */
   flight=birdFlight.animate([
-    {transform:`perspective(900px) translate3d(${startX}px,${startY}px,-150px) rotateZ(-14deg) rotateY(-12deg) scale(.46)`,opacity:0,filter:'blur(1.2px)',offset:0},
-    {transform:`perspective(900px) translate3d(${startX*.83}px,${startY*.78}px,-115px) rotateZ(-12deg) rotateY(-9deg) scale(.55)`,opacity:.58,filter:'blur(.8px)',offset:.12},
-    {transform:`perspective(900px) translate3d(${startX*.60}px,${startY*.55}px,-76px) rotateZ(-9deg) rotateY(-5deg) scale(.67)`,opacity:.88,filter:'blur(.35px)',offset:.29},
-    {transform:`perspective(900px) translate3d(${startX*.39}px,${startY*.34}px,-42px) rotateZ(-6deg) rotateY(4deg) scale(.78)`,opacity:1,filter:'blur(0)',offset:.47},
-    {transform:`perspective(900px) translate3d(${startX*.21}px,${startY*.18}px,-18px) rotateZ(-3deg) rotateY(7deg) scale(.88)`,opacity:1,filter:'blur(0)',offset:.64},
-    {transform:`perspective(900px) translate3d(${startX*.085}px,${startY*.068}px,-5px) rotateZ(-1deg) rotateY(3deg) scale(.96)`,opacity:1,filter:'blur(0)',offset:.81},
-    {transform:'perspective(900px) translate3d(-4px,5px,0) rotateZ(-.4deg) rotateY(1deg) scale(.99)',opacity:1,filter:'blur(0)',offset:.93},
+    {transform:`perspective(900px) translate3d(${startX}px,${startY}px,-145px) rotateZ(-11deg) rotateY(-8deg) scale(.48)`,opacity:0,filter:'blur(.6px)',offset:0},
+    {transform:`perspective(900px) translate3d(${startX*.84}px,${startY*.79}px,-112px) rotateZ(-9deg) rotateY(-6deg) scale(.56)`,opacity:.5,filter:'blur(.35px)',offset:.13},
+    {transform:`perspective(900px) translate3d(${startX*.62}px,${startY*.57}px,-78px) rotateZ(-6deg) rotateY(-2deg) scale(.66)`,opacity:.85,filter:'blur(.12px)',offset:.30},
+    {transform:`perspective(900px) translate3d(${startX*.43}px,${startY*.36}px,-48px) rotateZ(-3deg) rotateY(4deg) scale(.76)`,opacity:1,filter:'blur(0)',offset:.47},
+    {transform:`perspective(900px) translate3d(${startX*.26}px,${startY*.20}px,-25px) rotateZ(-1deg) rotateY(5deg) scale(.85)`,opacity:1,filter:'blur(0)',offset:.63},
+    {transform:`perspective(900px) translate3d(${startX*.12}px,${startY*.085}px,-9px) rotateZ(.7deg) rotateY(2deg) scale(.93)`,opacity:1,filter:'blur(0)',offset:.78},
+    {transform:`perspective(900px) translate3d(${startX*.035}px,${startY*.025}px,-2px) rotateZ(-.4deg) rotateY(1deg) scale(.98)`,opacity:1,filter:'blur(0)',offset:.90},
+    {transform:'perspective(900px) translate3d(-2px,3px,0) rotateZ(-.15deg) rotateY(.4deg) scale(.995)',opacity:1,filter:'blur(0)',offset:.965},
     {transform:'perspective(900px) translate3d(0,0,0) rotateZ(0) rotateY(0) scale(1)',opacity:1,filter:'blur(0)',offset:1}
   ],{duration,easing:'cubic-bezier(.22,.56,.18,1)',fill:'both'});
 
-  /* 左右翼獨立拍動：前段有三次完整下拍，中段一次輕拍，最後展翼滑翔。 */
+  /* 不等距、低幅度拍翅：兩次推進後進入長滑翔，避免規律的機械感。 */
   const leftFrames=[
     {transform:'rotateX(0deg) rotateZ(0deg)',offset:0},
-    {transform:'rotateX(47deg) rotateZ(-5deg) translateY(1px)',offset:.07},
-    {transform:'rotateX(-8deg) rotateZ(2deg)',offset:.14},
-    {transform:'rotateX(43deg) rotateZ(-4deg) translateY(1px)',offset:.22},
-    {transform:'rotateX(-6deg) rotateZ(1deg)',offset:.30},
-    {transform:'rotateX(36deg) rotateZ(-3deg)',offset:.39},
-    {transform:'rotateX(-4deg) rotateZ(1deg)',offset:.48},
-    {transform:'rotateX(25deg) rotateZ(-2deg)',offset:.58},
-    {transform:'rotateX(0deg) rotateZ(0deg)',offset:.68},
-    {transform:'rotateX(-5deg) rotateZ(1deg) scaleX(1.025)',offset:.82},
+    {transform:'rotateX(25deg) rotateZ(-2.4deg) translateY(.5px)',offset:.085},
+    {transform:'rotateX(-4deg) rotateZ(.8deg)',offset:.18},
+    {transform:'rotateX(21deg) rotateZ(-2deg) translateY(.4px)',offset:.285},
+    {transform:'rotateX(-3deg) rotateZ(.6deg)',offset:.40},
+    {transform:'rotateX(12deg) rotateZ(-1deg)',offset:.515},
+    {transform:'rotateX(1deg) rotateZ(0deg)',offset:.62},
+    {transform:'rotateX(-3deg) rotateZ(.6deg) scaleX(1.018)',offset:.76},
+    {transform:'rotateX(-5deg) rotateZ(.8deg) scaleX(1.025)',offset:.87},
+    {transform:'rotateX(-2deg) rotateZ(.3deg) scaleX(1.012)',offset:.95},
     {transform:'rotateX(0deg) rotateZ(0deg) scaleX(1)',offset:1}
   ];
   const rightFrames=leftFrames.map(frame=>({
     ...frame,
     transform:frame.transform.replace(/rotateZ\((-?[\d.]+)deg\)/,(_,n)=>`rotateZ(${-Number(n)}deg)`)
   }));
-  leftWing=birdLeft.animate(leftFrames,{duration,easing:'cubic-bezier(.34,.05,.2,1)',fill:'both'});
-  rightWing=birdRight.animate(rightFrames,{duration,easing:'cubic-bezier(.34,.05,.2,1)',fill:'both'});
+  leftWing=birdLeft.animate(leftFrames,{duration,easing:'cubic-bezier(.32,.08,.18,1)',fill:'both'});
+  rightWing=birdRight.animate(rightFrames,{duration:duration+90,easing:'cubic-bezier(.32,.08,.18,1)',fill:'both'});
 
   bodyMotion=birdBody.animate([
-    {transform:'translateY(1px) rotateZ(-1deg)',offset:0},
-    {transform:'translateY(-1px) rotateZ(.6deg)',offset:.30},
-    {transform:'translateY(.5px) rotateZ(-.35deg)',offset:.58},
+    {transform:'translateY(.6px) rotateZ(-.5deg)',offset:0},
+    {transform:'translateY(-.7px) rotateZ(.35deg)',offset:.31},
+    {transform:'translateY(.3px) rotateZ(-.18deg)',offset:.60},
     {transform:'translateY(0) rotateZ(0)',offset:1}
   ],{duration,easing:'ease-in-out',fill:'both'});
 }
