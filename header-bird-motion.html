@@ -47,49 +47,47 @@ const bird=document.getElementById('weatherBird');
 const birdFlight=document.getElementById('birdFlight');
 const slot=document.getElementById('birdSlot');
 let flight;
-let wings;
+let wingRhythm;
 
 function flyToPosition(){
   if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if(flight) flight.cancel();
-  if(wings) wings.cancel();
+  if(wingRhythm) wingRhythm.cancel();
   bird.classList.remove('arrived');
-  const target=slot.getBoundingClientRect();
-  const startX=-(target.left+target.width/2+90);
-  const startY=Math.min(innerHeight*.38,310);
+  const startX=Math.min(innerWidth*.25,300);
+  const startY=Math.min(innerHeight*.52,440);
 
-  /* 大弧線飛入：先從左下遠處起飛，中段抬升，最後繞一個小弧減速停靠。 */
+  /* 起飛加速、側身滑翔、展翼煞停。速度與側傾依飛行階段變化。 */
   flight=birdFlight.animate([
-    {transform:`translate3d(${startX}px,${startY}px,0) rotate(72deg) scale(.48)`,opacity:0,offset:0},
-    {transform:`translate3d(${startX*.88}px,${startY*.76}px,0) rotate(68deg) scale(.58)`,opacity:.72,offset:.10},
-    {transform:`translate3d(${startX*.72}px,${startY*.42}px,0) rotate(62deg) scale(.69)`,opacity:1,offset:.23},
-    {transform:`translate3d(${startX*.54}px,${-startY*.08}px,0) rotate(76deg) scale(.80)`,opacity:1,offset:.37},
-    {transform:`translate3d(${startX*.38}px,${-startY*.22}px,0) rotate(88deg) scale(.88)`,opacity:1,offset:.50},
-    {transform:`translate3d(${startX*.22}px,${-startY*.12}px,0) rotate(78deg) scale(.95)`,opacity:1,offset:.63},
-    {transform:`translate3d(${startX*.09}px,18px,0) rotate(58deg) scale(1.03)`,opacity:1,offset:.75},
-    {transform:'translate3d(20px,-13px,0) rotate(34deg) scale(1.06)',opacity:1,offset:.84},
-    {transform:'translate3d(7px,5px,0) rotate(15deg) scale(1.025)',opacity:1,offset:.91},
-    {transform:'translate3d(-3px,-2px,0) rotate(4deg) scale(.99)',opacity:1,offset:.965},
-    {transform:'translate3d(0,0,0) rotate(0deg) scale(1)',opacity:1,offset:1}
+    {transform:`perspective(700px) translate3d(${startX}px,${startY}px,-120px) rotateZ(-24deg) rotateY(-28deg) scale(.50)`,filter:'blur(1.8px)',opacity:0,offset:0},
+    {transform:`perspective(700px) translate3d(${startX*.82}px,${startY*.79}px,-95px) rotateZ(-22deg) rotateY(-24deg) scale(.58)`,filter:'blur(1.2px)',opacity:.58,offset:.10},
+    {transform:`perspective(700px) translate3d(${startX*.56}px,${startY*.53}px,-62px) rotateZ(-17deg) rotateY(-16deg) scale(.69)`,filter:'blur(.65px)',opacity:.9,offset:.24},
+    {transform:`perspective(700px) translate3d(${startX*.33}px,${startY*.31}px,-32px) rotateZ(-11deg) rotateY(-8deg) scale(.80)`,filter:'blur(.25px)',opacity:1,offset:.41},
+    {transform:`perspective(700px) translate3d(${startX*.17}px,${startY*.15}px,-12px) rotateZ(-6deg) rotateY(5deg) scale(.89)`,filter:'blur(0)',opacity:1,offset:.60},
+    {transform:`perspective(700px) translate3d(${startX*.07}px,${startY*.055}px,0) rotateZ(-2.5deg) rotateY(9deg) scale(.95)`,filter:'blur(0)',opacity:1,offset:.76},
+    {transform:'perspective(700px) translate3d(8px,6px,0) rotateZ(-1deg) rotateY(4deg) scale(.985)',filter:'blur(0)',opacity:1,offset:.89},
+    {transform:'perspective(700px) translate3d(2px,1px,0) rotateZ(-.25deg) rotateY(1deg) scale(.997)',filter:'blur(0)',opacity:1,offset:.965},
+    {transform:'perspective(700px) translate3d(0,0,0) rotateZ(0) rotateY(0) scale(1)',filter:'blur(0)',opacity:1,offset:1}
   ],{
-    duration:4200,
-    easing:'cubic-bezier(.25,.55,.18,1)',
+    duration:4400,
+    easing:'cubic-bezier(.16,.58,.18,1)',
     fill:'both'
   });
 
-  /* 飛行中的振翅與呼吸感，接近定位時逐漸收斂。 */
-  wings=bird.animate([
-    {transform:'scaleX(.90) scaleY(.72) rotate(-2deg)',offset:0},
-    {transform:'scaleX(1.06) scaleY(1.08) rotate(2deg)',offset:.10},
-    {transform:'scaleX(.92) scaleY(.76) rotate(-2deg)',offset:.20},
-    {transform:'scaleX(1.05) scaleY(1.07) rotate(2deg)',offset:.31},
-    {transform:'scaleX(.93) scaleY(.78) rotate(-1deg)',offset:.42},
-    {transform:'scaleX(1.04) scaleY(1.06) rotate(1.5deg)',offset:.54},
-    {transform:'scaleX(.95) scaleY(.82) rotate(-1deg)',offset:.66},
-    {transform:'scaleX(1.025) scaleY(1.035) rotate(1deg)',offset:.78},
-    {transform:'scaleX(.98) scaleY(.92) rotate(-.5deg)',offset:.89},
-    {transform:'scaleX(1) scaleY(1) rotate(0)',offset:1}
-  ],{duration:4200,easing:'cubic-bezier(.42,0,.3,1)',fill:'both'});
+  /* 只用細微尺度模擬拍翅推進與最後展翼，不扭曲鳥的輪廓。 */
+  wingRhythm=bird.animate([
+    {transform:'scaleX(.96) scaleY(.96)',offset:0},
+    {transform:'scaleX(1.035) scaleY(1.015)',offset:.07},
+    {transform:'scaleX(.97) scaleY(.975)',offset:.14},
+    {transform:'scaleX(1.03) scaleY(1.012)',offset:.22},
+    {transform:'scaleX(.98) scaleY(.985)',offset:.31},
+    {transform:'scaleX(1.015) scaleY(1)',offset:.43},
+    {transform:'scaleX(.99) scaleY(.995)',offset:.56},
+    {transform:'scaleX(1.01) scaleY(1)',offset:.69},
+    {transform:'scaleX(1.07) scaleY(.985)',offset:.83},
+    {transform:'scaleX(1.035) scaleY(.995)',offset:.91},
+    {transform:'scaleX(1) scaleY(1)',offset:1}
+  ],{duration:4400,easing:'ease-in-out',fill:'both'});
   flight.onfinish=()=>bird.classList.add('arrived');
 }
 
