@@ -17,7 +17,7 @@ body{overflow:hidden}
 .bird-rig{position:relative;width:47px;height:47px;transform-style:preserve-3d;filter:drop-shadow(0 0 8px rgba(255,255,255,.08))}
 .bird-image{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;will-change:opacity,transform}
 .bird-depth{z-index:0;opacity:.18;filter:blur(.9px) brightness(.45);transform:translate3d(0,2px,-7px)}
-.bird-motion{z-index:2;opacity:1}.bird-still{z-index:3;opacity:0}
+.bird-motion{z-index:2;opacity:1;background-image:url('weather-bird-sprite.png');background-size:1000% 2000%;background-repeat:no-repeat;background-position:0 0}.bird-still{z-index:3;opacity:0}
 .language{width:150px;text-align:right;font-size:12px;font-weight:300;letter-spacing:.04em;opacity:.85}
 .stage{height:calc(100svh - 96px);background:#000}
 @media(max-width:700px){
@@ -40,8 +40,8 @@ body{overflow:hidden}
       <span class="bird-flight" id="birdFlight">
         <span class="bird-rig" id="birdRig" role="img" aria-label="天氣鳥">
           <img class="bird-image bird-depth" id="birdDepth" src="weather-bird-still.png" alt="">
-          <img class="bird-image bird-motion" id="birdMotion" src="weather-bird-motion.gif" alt="">
-          <img class="bird-image bird-still" id="birdStill" src="weather-bird-still.png" alt="">
+          <span class="bird-image bird-motion" id="birdMotion"></span>
+          <img class="bird-image bird-still" id="birdStill" src="weather-bird-final.png" alt="">
         </span>
       </span>
     </button>
@@ -58,6 +58,16 @@ const birdMotion=document.getElementById('birdMotion');
 const birdStill=document.getElementById('birdStill');
 const slot=document.getElementById('birdSlot');
 let flightFrame=0;
+const spriteColumns=10;
+const spriteRows=20;
+const spriteFrames=195;
+
+function setBirdFrame(frame){
+  const index=((frame%spriteFrames)+spriteFrames)%spriteFrames;
+  const column=index%spriteColumns;
+  const row=Math.floor(index/spriteColumns);
+  birdMotion.style.backgroundPosition=`${column/(spriteColumns-1)*100}% ${row/(spriteRows-1)*100}%`;
+}
 
 function bezier(p0,p1,p2,p3,t){
   const u=1-t;
@@ -89,12 +99,16 @@ function flyToPosition(){
   const p2={x:0,y:startY*.19};
   const p3={x:0,y:0};
   const began=performance.now();
+  let previousTime=began;
+  let frameCursor=0;
 
   birdMotion.style.opacity='1';
   birdStill.style.opacity='0';
 
   function render(now){
     const raw=Math.min(1,(now-began)/duration);
+    const elapsed=Math.min(64,Math.max(0,now-previousTime));
+    previousTime=now;
     const t=smootherstep(raw);
     const x=bezier(p0.x,p1.x,p2.x,p3.x,t);
     const y=bezier(p0.y,p1.y,p2.y,p3.y,t);
@@ -119,11 +133,22 @@ function flyToPosition(){
     const finalSettle=phase(.91,1,raw);
     const motionAmount=wingEnergy*(1-finalSettle);
 
+    /* 直接控制原始影格播放速度：下拍快、滑翔慢、轉向與煞停各有不同速率。 */
+    let wingSpeed;
+    if(raw<.20) wingSpeed=2.15;
+    else if(raw<.48) wingSpeed=.22;
+    else if(raw<.66) wingSpeed=1.35;
+    else if(raw<.77) wingSpeed=.30;
+    else if(raw<.91) wingSpeed=.92;
+    else wingSpeed=.12;
+    frameCursor=(frameCursor+elapsed/30*wingSpeed)%spriteFrames;
+    setBirdFrame(Math.floor(frameCursor));
+
     birdFlight.style.transform=`perspective(1300px) translate3d(${x}px,${y}px,${depth}px) rotateZ(${heading+yawDrift}deg) rotateX(${pitch}deg) rotateY(${roll}deg) scale(${scale})`;
     birdFlight.style.filter=`blur(${blur}px)`;
     birdFlight.style.opacity=String(opacity);
-    birdMotion.style.opacity=String(motionAmount);
-    birdStill.style.opacity=String(1-motionAmount);
+    birdMotion.style.opacity=String(1-finalSettle);
+    birdStill.style.opacity=String(finalSettle);
     birdRig.style.transform=`translate3d(0,${-1.4*wingEnergy}px,0) scale(${1+.018*wingEnergy})`;
     birdDepth.style.opacity=String(.20*(1-finalSettle)*(0.55+0.45*t));
 
