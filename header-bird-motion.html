@@ -83,6 +83,10 @@ function smootherstep(t){
   return t*t*t*(t*(t*6-15)+10);
 }
 
+function easeOutCubic(t){
+  return 1-Math.pow(1-t,3);
+}
+
 function phase(from,to,value){
   const n=Math.max(0,Math.min(1,(value-from)/(to-from)));
   return smootherstep(n);
@@ -91,13 +95,13 @@ function phase(from,to,value){
 function flyToPosition(){
   if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   cancelAnimationFrame(flightFrame);
-  const startX=-Math.min(innerWidth*.18,220);
-  const startY=Math.min(innerHeight*.58,500);
-  const curveX=Math.min(innerWidth*.15,180);
-  const duration=6200;
+  const startX=-Math.min(innerWidth*.30,360);
+  const startY=Math.min(innerHeight*.18,140);
+  const curveX=Math.min(innerWidth*.18,210);
+  const duration=5400;
   const p0={x:startX,y:startY};
-  const p1={x:curveX,y:startY*.72};
-  const p2={x:-curveX*.30,y:startY*.20};
+  const p1={x:-curveX*.58,y:startY*.78};
+  const p2={x:-curveX*.14,y:-12};
   const p3={x:0,y:0};
   const began=performance.now();
   let previousTime=began;
@@ -110,48 +114,53 @@ function flyToPosition(){
     const raw=Math.min(1,(now-began)/duration);
     const elapsed=Math.min(64,Math.max(0,now-previousTime));
     previousTime=now;
-    const t=smootherstep(raw);
+    /* 前段有推進力，後段把最後 12% 留給安靜、精準的落位。 */
+    const t=raw<.72
+      ? .88*easeOutCubic(raw/.72)
+      : .88+.12*smootherstep((raw-.72)/.28);
     const x=bezier(p0.x,p1.x,p2.x,p3.x,t);
     const y=bezier(p0.y,p1.y,p2.y,p3.y,t);
     const dx=bezierTangent(p0.x,p1.x,p2.x,p3.x,t);
     const dy=bezierTangent(p0.y,p1.y,p2.y,p3.y,t);
 
-    /* 圖像頭部朝上，因此切線角度加 90 度即可始終朝向前進方向。 */
-    const heading=Math.atan2(dy,dx)*180/Math.PI+90;
-    /* 平面鳥的三軸姿態：pitch 控制俯仰、roll 控制側傾、heading 控制鳥頭方向。 */
-    const pitch=-27*(1-t)+Math.sin(raw*Math.PI*2.4)*4.5*(1-raw);
-    const roll=Math.sin(raw*Math.PI*2.35)*18*Math.pow(1-raw,.62);
-    const yawDrift=Math.sin(raw*Math.PI*2.1)*2.2*(1-raw);
-    /* 沿原本路線飛行，只用景深尺寸表現「由大變小」並收進 Header 定位。 */
-    const scale=1+1.38*Math.pow(1-t,1.16);
-    const depth=210*Math.pow(1-t,1.18)+Math.sin(raw*Math.PI*2.1)*24*(1-raw);
-    const blur=1.2*Math.pow(1-t,1.7);
-    const opacity=Math.min(1,raw/.15);
-    /* 拍翅不是等速循環，而是三段有呼吸的節奏：起飛、轉向、煞停。 */
-    const launch=1-phase(.12,.25,raw);
-    const turn=phase(.28,.35,raw)*(1-phase(.50,.60,raw));
-    const landing=phase(.61,.69,raw)*(1-phase(.92,1,raw));
-    const wingEnergy=Math.max(launch*.72,turn*.88,landing);
-    const finalSettle=phase(.94,1,raw);
-    const motionAmount=wingEnergy*(1-finalSettle);
+    const align=phase(.54,.94,raw);
+    const pathHeading=Math.atan2(dy,dx)*180/Math.PI+90;
+    const heading=pathHeading*(1-align);
+    /* 姿態只保留一次側傾與一次收勢，避免反覆搖晃造成卡通感。 */
+    const pitch=5.5*(1-t)-2.4*Math.sin(Math.PI*phase(.58,.92,raw));
+    const roll=-7.5*Math.sin(Math.PI*phase(.04,.66,raw))*(1-align);
+    const yawDrift=1.15*Math.sin(Math.PI*phase(.12,.58,raw))*(1-align);
+    /* 尺寸先明顯收近，再用很長的尾韻精準縮進 Header 定位。 */
+    const scaleProgress=raw<.68
+      ? .90*easeOutCubic(raw/.68)
+      : .90+.10*smootherstep((raw-.68)/.32);
+    const scale=2.32+(1-2.32)*scaleProgress;
+    const depth=82*(1-scaleProgress)+6*Math.sin(Math.PI*raw)*(1-align);
+    const blur=.38*Math.pow(1-scaleProgress,1.8);
+    const opacity=Math.min(1,raw/.075);
+    /* 拍翅節奏：近景兩次有力下拍 → 長滑翔 → 落位前收翼減速。 */
+    const launch=Math.sin(Math.PI*Math.min(1,raw/.24));
+    const brake=Math.sin(Math.PI*Math.max(0,Math.min(1,(raw-.56)/.31)));
+    const wingEnergy=Math.max(.10,launch,brake*.92);
+    const finalSettle=phase(.88,1,raw);
 
-    /* 直接控制原始影格播放速度：下拍快、滑翔慢、轉向與煞停各有不同速率。 */
     let wingSpeed;
-    if(raw<.18) wingSpeed=.72;
-    else if(raw<.42) wingSpeed=1.55;
-    else if(raw<.60) wingSpeed=.42;
-    else if(raw<.72) wingSpeed=1.28;
-    else if(raw<.92) wingSpeed=2.45;
-    else wingSpeed=.20;
+    if(raw<.24) wingSpeed=1.52;
+    else if(raw<.56) wingSpeed=.22;
+    else if(raw<.82) wingSpeed=1.32;
+    else if(raw<.92) wingSpeed=.38;
+    else wingSpeed=.10;
     frameCursor=(frameCursor+elapsed/30*wingSpeed)%spriteFrames;
     setBirdFrame(Math.floor(frameCursor));
+
+    const wingLift=Math.max(0,Math.sin(frameCursor*.34))*wingEnergy;
 
     birdFlight.style.transform=`perspective(1300px) translate3d(${x}px,${y}px,${depth}px) rotateZ(${heading+yawDrift}deg) rotateX(${pitch}deg) rotateY(${roll}deg) scale(${scale})`;
     birdFlight.style.filter=`blur(${blur}px)`;
     birdFlight.style.opacity=String(opacity);
     birdMotion.style.opacity=String(1-finalSettle);
     birdStill.style.opacity=String(finalSettle);
-    birdRig.style.transform=`translate3d(0,${-2.3*wingEnergy}px,${4*wingEnergy}px) rotateX(${-3.5*landing}deg) scale(${1+.028*wingEnergy})`;
+    birdRig.style.transform=`translate3d(0,${-1.15*wingLift}px,${2.2*wingLift}px) rotateX(${-2.2*brake}deg) scale(${1+.012*wingLift})`;
     birdDepth.style.opacity=String(.20*(1-finalSettle)*(0.55+0.45*t));
 
     if(raw<1){
