@@ -73,6 +73,11 @@ function smootherstep(t){
   return t*t*t*(t*(t*6-15)+10);
 }
 
+function phase(from,to,value){
+  const n=Math.max(0,Math.min(1,(value-from)/(to-from)));
+  return smootherstep(n);
+}
+
 function flyToPosition(){
   if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   cancelAnimationFrame(flightFrame);
@@ -106,14 +111,21 @@ function flyToPosition(){
     const depth=-460*Math.pow(1-t,1.12)+Math.sin(raw*Math.PI*1.8)*28*(1-raw);
     const blur=3.2*Math.pow(1-t,1.7);
     const opacity=Math.min(1,raw/.20);
-    const settle=Math.max(0,(t-.84)/.16);
+    /* 拍翅不是等速循環，而是三段有呼吸的節奏：起飛、轉向、煞停。 */
+    const launch=1-phase(.16,.29,raw);
+    const turn=phase(.34,.41,raw)*(1-phase(.53,.62,raw));
+    const landing=phase(.69,.76,raw)*(1-phase(.87,.97,raw));
+    const wingEnergy=Math.max(launch,turn*.78,landing*.92);
+    const finalSettle=phase(.91,1,raw);
+    const motionAmount=wingEnergy*(1-finalSettle);
 
     birdFlight.style.transform=`perspective(1300px) translate3d(${x}px,${y}px,${depth}px) rotateZ(${heading+yawDrift}deg) rotateX(${pitch}deg) rotateY(${roll}deg) scale(${scale})`;
     birdFlight.style.filter=`blur(${blur}px)`;
     birdFlight.style.opacity=String(opacity);
-    birdMotion.style.opacity=String(1-settle);
-    birdStill.style.opacity=String(settle);
-    birdDepth.style.opacity=String(.20*(1-settle)*(0.55+0.45*t));
+    birdMotion.style.opacity=String(motionAmount);
+    birdStill.style.opacity=String(1-motionAmount);
+    birdRig.style.transform=`translate3d(0,${-1.4*wingEnergy}px,0) scale(${1+.018*wingEnergy})`;
+    birdDepth.style.opacity=String(.20*(1-finalSettle)*(0.55+0.45*t));
 
     if(raw<1){
       flightFrame=requestAnimationFrame(render);
@@ -122,6 +134,7 @@ function flyToPosition(){
       birdFlight.style.filter='blur(0)';
       birdMotion.style.opacity='0';
       birdStill.style.opacity='1';
+      birdRig.style.transform='translate3d(0,0,0) scale(1)';
       birdDepth.style.opacity='0';
     }
   }
