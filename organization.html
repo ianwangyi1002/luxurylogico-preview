@@ -14,7 +14,7 @@
       --muted:rgba(255,255,255,.48);
       --faint:rgba(255,255,255,.13);
       --line:rgba(255,255,255,.2);
-      --pad:clamp(24px,4vw,68px);
+      --pad:clamp(34px,6vw,104px);
       --ease:cubic-bezier(.22,.61,.36,1);
     }
     *{box-sizing:border-box}
@@ -71,9 +71,12 @@
     .member-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(14px,2vw,34px)}
     .member-card{text-align:left;cursor:pointer;position:relative;min-width:0}
     .member-image{aspect-ratio:1/1;overflow:hidden;border-radius:50%;background:#121212;position:relative}
-    .member-image img{width:100%;height:100%;object-fit:cover;filter:grayscale(1) brightness(.54) contrast(1.1);transform:scale(1.08);transition:filter .55s,transform .75s var(--ease),border-radius .6s var(--ease)}
+    .portrait-placeholder{position:absolute;inset:0;overflow:hidden;background:linear-gradient(145deg,#343434 0%,#1d1d1d 58%,#111 100%);transition:filter .55s,transform .75s var(--ease)}
+    .portrait-placeholder::before{content:"";position:absolute;left:50%;top:19%;width:29%;aspect-ratio:1;border-radius:50%;transform:translateX(-50%);background:linear-gradient(145deg,#b8b8b8,#686868 68%,#4a4a4a);box-shadow:inset -12px -9px 22px rgba(0,0,0,.22)}
+    .portrait-placeholder::after{content:"";position:absolute;left:50%;bottom:-10%;width:76%;height:57%;border-radius:50% 50% 12% 12%/36% 36% 12% 12%;transform:translateX(-50%);background:linear-gradient(145deg,#9b9b9b,#505050 68%,#343434);box-shadow:inset -22px 0 30px rgba(0,0,0,.2)}
+    .portrait-placeholder span{position:absolute;z-index:2;left:50%;bottom:9%;transform:translateX(-50%);font-size:8px;letter-spacing:.14em;color:rgba(255,255,255,.43);white-space:nowrap;text-transform:uppercase}
     .member-image::after{content:"";position:absolute;inset:0;border:1px solid rgba(255,255,255,.16);border-radius:inherit}
-    .member-card:hover .member-image img{filter:grayscale(.25) brightness(.8);transform:scale(1.015)}
+    .member-card:hover .portrait-placeholder{filter:brightness(1.16);transform:scale(1.02)}
     .member-card:hover .member-image{border-radius:3%}
     .member-info{display:grid;grid-template-columns:1fr auto;gap:15px;padding-top:17px;border-top:1px solid transparent}
     .member-info h4{font-size:14px;font-weight:350;margin:0 0 5px}
@@ -90,7 +93,10 @@
     .profile-name .en{display:block;margin-top:18px;font-size:11px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase}
     .profile-role{padding-top:20px;border-top:1px solid var(--faint);font-size:10px;line-height:1.8;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
     .profile-visual{height:calc(100vh - 88px);position:sticky;top:88px;overflow:hidden;background:#0c0c0c}
-    .profile-visual img{width:100%;height:100%;object-fit:cover;filter:grayscale(.86) contrast(1.05) brightness(.67);transform:scale(1.02)}
+    .profile-visual .portrait-placeholder{transform:none}
+    .profile-visual .portrait-placeholder::before{top:14%;width:min(30%,330px)}
+    .profile-visual .portrait-placeholder::after{bottom:-14%;width:min(75%,760px);height:65%}
+    .profile-visual .portrait-placeholder span{bottom:7%}
     .profile-visual::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,5,5,.13),transparent 35%),linear-gradient(0deg,rgba(5,5,5,.48),transparent 35%)}
     .profile-visual .visual-caption{position:absolute;z-index:1;left:24px;bottom:20px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.7)}
 
@@ -126,7 +132,7 @@
     .next-link strong{font-size:clamp(22px,3vw,42px);font-weight:300}
 
     @media(max-width:900px){
-      :root{--pad:22px}
+      :root{--pad:26px}
       .site-header{height:72px;grid-template-columns:1fr auto 1fr;padding-bottom:3px;background:#050505}
       .brand{width:132px}
       .main-nav{position:static;gap:0}.main-nav a{display:none}.nav-bird{width:27px;height:22px}
@@ -208,10 +214,14 @@
       honghao:{name:'黃弘豪',en:'Huang Hung-Hao',role:'Technical Production',group:'專業成員',image:images.light,bio:'負責裝置技術製作與現場整合，協助機械、燈光、控制系統與展場條件之間保持穩定而精確的運作。',works:['algorithm-harmony','perpetual-realm','sun-domain']}
     };
 
+    function portrait(name){
+      return `<div class="portrait-placeholder" role="img" aria-label="${name} 灰階人物照片示意"><span>Portrait / Sample</span></div>`;
+    }
+
     function memberCard(id,index,professional=false){
       const m=members[id];
       return `<button class="member-card ${professional?'professional':''}" type="button" data-member="${id}" aria-label="查看 ${m.name} 個人頁面">
-        <div class="member-image"><img src="${m.image}" alt="${m.name} 成員示意"></div>
+        <div class="member-image">${portrait(m.name)}</div>
         <div class="member-info"><div><h4>${m.name}</h4><p>${m.role}</p></div><span class="member-index">${String(index+1).padStart(2,'0')}</span></div>
       </button>`;
     }
@@ -253,7 +263,7 @@
             <div class="profile-name"><div class="eyebrow">${m.group} / Member</div><span class="cn">${m.name}</span><span class="en">${m.en}</span></div>
             <div class="profile-role">${m.role}<br>LuxuryLogico / Taipei</div>
           </div>
-          <div class="profile-visual"><img src="${m.image}" alt="${m.name} 個人頁面示意"><div class="visual-caption">Member profile / ${m.en}</div></div>
+          <div class="profile-visual">${portrait(m.name)}<div class="visual-caption">Member profile / ${m.en}</div></div>
         </div>
         <div class="profile-body">
           <section class="profile-about"><div><div class="eyebrow">Profile / 01</div><h2>成員介紹</h2></div><p class="bio">${m.bio}</p></section>
