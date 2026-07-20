@@ -13,7 +13,8 @@ body{overflow:hidden}
 .header-nav{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:38px;font-size:14px;font-weight:300;letter-spacing:.01em}
 .header-nav a{color:#fff;text-decoration:none;opacity:.92}
 .bird-slot{position:relative;width:54px;height:54px;display:grid;place-items:center;cursor:pointer}
-.bird{display:block;width:47px;height:33px;object-fit:contain;transform-origin:50% 55%;will-change:transform,opacity;filter:drop-shadow(0 0 0 transparent)}
+.bird-flight{width:47px;height:33px;display:grid;place-items:center;transform-origin:50% 55%;will-change:transform,opacity}
+.bird{display:block;width:47px;height:33px;object-fit:contain;transform-origin:50% 55%;will-change:transform;filter:drop-shadow(0 0 0 transparent)}
 .bird.arrived{filter:drop-shadow(0 0 8px rgba(255,255,255,.12))}
 .language{width:150px;text-align:right;font-size:12px;font-weight:300;letter-spacing:.04em;opacity:.85}
 .stage{height:calc(100svh - 96px);background:#000}
@@ -21,11 +22,11 @@ body{overflow:hidden}
  .site-header{height:76px;padding:0 20px}
  .brand{width:100px}.brand img{width:92px}
  .header-nav{gap:0}.header-nav a{display:none}
- .bird-slot{width:36px;height:36px}.bird{width:31px;height:22px}
+ .bird-slot{width:36px;height:36px}.bird-flight,.bird{width:31px;height:22px}
  .language{width:100px;font-size:0}.language:after{content:"";display:inline-block;width:18px;height:14px;background:linear-gradient(#fff,#fff) top/18px 1px no-repeat,linear-gradient(#fff,#fff) bottom/18px 1px no-repeat}
  .stage{height:calc(100svh - 76px)}
 }
-@media(prefers-reduced-motion:reduce){.bird{transform:none!important;opacity:1!important}}
+@media(prefers-reduced-motion:reduce){.bird-flight,.bird{transform:none!important;opacity:1!important}}
 </style>
 </head>
 <body>
@@ -34,7 +35,7 @@ body{overflow:hidden}
   <nav class="header-nav" aria-label="主要選單">
     <a href="#">Works</a>
     <button class="bird-slot" id="birdSlot" type="button" aria-label="重播天氣鳥進場動畫" style="border:0;background:transparent;padding:0">
-      <img class="bird" id="weatherBird" src="weather-bird-motion.gif" alt="天氣鳥">
+      <span class="bird-flight" id="birdFlight"><img class="bird" id="weatherBird" src="weather-bird-motion.gif" alt="天氣鳥"></span>
     </button>
     <a href="#">About</a>
   </nav>
@@ -43,27 +44,52 @@ body{overflow:hidden}
 <main class="stage"></main>
 <script>
 const bird=document.getElementById('weatherBird');
+const birdFlight=document.getElementById('birdFlight');
 const slot=document.getElementById('birdSlot');
 let flight;
+let wings;
 
 function flyToPosition(){
   if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if(flight) flight.cancel();
+  if(wings) wings.cancel();
   bird.classList.remove('arrived');
-  const travel=Math.max(innerWidth*.56,420);
-  flight=bird.animate([
-    {transform:`translate3d(${-travel}px,28px,0) rotate(-10deg) scale(.72)`,opacity:0,offset:0},
-    {transform:`translate3d(${-travel*.78}px,-14px,0) rotate(8deg) scale(.8)`,opacity:.75,offset:.16},
-    {transform:`translate3d(${-travel*.56}px,18px,0) rotate(-7deg) scale(.88)`,opacity:.9,offset:.34},
-    {transform:`translate3d(${-travel*.32}px,-10px,0) rotate(6deg) scale(.95)`,opacity:1,offset:.54},
-    {transform:'translate3d(14px,4px,0) rotate(-3deg) scale(1.04)',opacity:1,offset:.78},
-    {transform:'translate3d(-5px,-2px,0) rotate(1.5deg) scale(.985)',opacity:1,offset:.9},
+  const target=slot.getBoundingClientRect();
+  const startX=-(target.left+target.width/2+90);
+  const startY=Math.min(innerHeight*.38,310);
+
+  /* 大弧線飛入：先從左下遠處起飛，中段抬升，最後繞一個小弧減速停靠。 */
+  flight=birdFlight.animate([
+    {transform:`translate3d(${startX}px,${startY}px,0) rotate(-18deg) scale(.48)`,opacity:0,offset:0},
+    {transform:`translate3d(${startX*.88}px,${startY*.76}px,0) rotate(-12deg) scale(.58)`,opacity:.72,offset:.10},
+    {transform:`translate3d(${startX*.72}px,${startY*.42}px,0) rotate(-5deg) scale(.69)`,opacity:1,offset:.23},
+    {transform:`translate3d(${startX*.54}px,${-startY*.08}px,0) rotate(10deg) scale(.80)`,opacity:1,offset:.37},
+    {transform:`translate3d(${startX*.38}px,${-startY*.22}px,0) rotate(15deg) scale(.88)`,opacity:1,offset:.50},
+    {transform:`translate3d(${startX*.22}px,${-startY*.12}px,0) rotate(4deg) scale(.95)`,opacity:1,offset:.63},
+    {transform:`translate3d(${startX*.09}px,18px,0) rotate(-11deg) scale(1.03)`,opacity:1,offset:.75},
+    {transform:'translate3d(20px,-13px,0) rotate(9deg) scale(1.07)',opacity:1,offset:.84},
+    {transform:'translate3d(7px,5px,0) rotate(-4deg) scale(1.025)',opacity:1,offset:.91},
+    {transform:'translate3d(-3px,-2px,0) rotate(1.5deg) scale(.99)',opacity:1,offset:.965},
     {transform:'translate3d(0,0,0) rotate(0deg) scale(1)',opacity:1,offset:1}
   ],{
-    duration:1850,
-    easing:'cubic-bezier(.22,.72,.18,1)',
+    duration:2650,
+    easing:'cubic-bezier(.18,.62,.2,1)',
     fill:'both'
   });
+
+  /* 飛行中的振翅與呼吸感，接近定位時逐漸收斂。 */
+  wings=bird.animate([
+    {transform:'scaleX(.90) scaleY(.72) rotate(-2deg)',offset:0},
+    {transform:'scaleX(1.06) scaleY(1.08) rotate(2deg)',offset:.10},
+    {transform:'scaleX(.92) scaleY(.76) rotate(-2deg)',offset:.20},
+    {transform:'scaleX(1.05) scaleY(1.07) rotate(2deg)',offset:.31},
+    {transform:'scaleX(.93) scaleY(.78) rotate(-1deg)',offset:.42},
+    {transform:'scaleX(1.04) scaleY(1.06) rotate(1.5deg)',offset:.54},
+    {transform:'scaleX(.95) scaleY(.82) rotate(-1deg)',offset:.66},
+    {transform:'scaleX(1.025) scaleY(1.035) rotate(1deg)',offset:.78},
+    {transform:'scaleX(.98) scaleY(.92) rotate(-.5deg)',offset:.89},
+    {transform:'scaleX(1) scaleY(1) rotate(0)',offset:1}
+  ],{duration:2650,easing:'ease-in-out',fill:'both'});
   flight.onfinish=()=>bird.classList.add('arrived');
 }
 
