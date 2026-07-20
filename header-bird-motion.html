@@ -14,11 +14,9 @@ body{overflow:hidden}
 .header-nav a{color:#fff;text-decoration:none;opacity:.92}
 .bird-slot{position:relative;width:54px;height:54px;display:grid;place-items:center;cursor:pointer}
 .bird-flight{width:47px;height:47px;display:grid;place-items:center;transform-origin:50% 50%;transform-style:preserve-3d;will-change:transform,opacity,filter}
-.bird-rig{position:relative;width:47px;height:47px;transform-style:preserve-3d;filter:drop-shadow(0 0 7px rgba(255,255,255,.10))}
-.bird-part{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;will-change:transform}
-.bird-body{clip-path:polygon(42% 14%,58% 14%,61% 88%,39% 88%);z-index:3;transform-origin:50% 48%}
-.bird-left{clip-path:polygon(0 10%,52% 10%,52% 61%,0 61%);z-index:2;transform-origin:51% 43%}
-.bird-right{clip-path:polygon(48% 10%,100% 10%,100% 61%,48% 61%);z-index:2;transform-origin:49% 43%}
+.bird-rig{position:relative;width:47px;height:47px;filter:drop-shadow(0 0 8px rgba(255,255,255,.08))}
+.bird-image{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;will-change:opacity,transform}
+.bird-motion{opacity:1}.bird-still{opacity:0}
 .language{width:150px;text-align:right;font-size:12px;font-weight:300;letter-spacing:.04em;opacity:.85}
 .stage{height:calc(100svh - 96px);background:#000}
 @media(max-width:700px){
@@ -29,7 +27,7 @@ body{overflow:hidden}
  .language{width:100px;font-size:0}.language:after{content:"";display:inline-block;width:18px;height:14px;background:linear-gradient(#fff,#fff) top/18px 1px no-repeat,linear-gradient(#fff,#fff) bottom/18px 1px no-repeat}
  .stage{height:calc(100svh - 76px)}
 }
-@media(prefers-reduced-motion:reduce){.bird-flight,.bird-part{transform:none!important;opacity:1!important}}
+@media(prefers-reduced-motion:reduce){.bird-flight,.bird-image{transform:none!important}.bird-motion{opacity:0!important}.bird-still{opacity:1!important}}
 </style>
 </head>
 <body>
@@ -40,9 +38,8 @@ body{overflow:hidden}
     <button class="bird-slot" id="birdSlot" type="button" aria-label="重播天氣鳥進場動畫" style="border:0;background:transparent;padding:0">
       <span class="bird-flight" id="birdFlight">
         <span class="bird-rig" id="birdRig" role="img" aria-label="天氣鳥">
-          <img class="bird-part bird-left" id="birdLeft" src="weather-bird-still.png" alt="">
-          <img class="bird-part bird-right" id="birdRight" src="weather-bird-still.png" alt="">
-          <img class="bird-part bird-body" id="birdBody" src="weather-bird-still.png" alt="">
+          <img class="bird-image bird-motion" id="birdMotion" src="weather-bird-motion.gif" alt="">
+          <img class="bird-image bird-still" id="birdStill" src="weather-bird-still.png" alt="">
         </span>
       </span>
     </button>
@@ -54,65 +51,43 @@ body{overflow:hidden}
 <script>
 const birdFlight=document.getElementById('birdFlight');
 const birdRig=document.getElementById('birdRig');
-const birdLeft=document.getElementById('birdLeft');
-const birdRight=document.getElementById('birdRight');
-const birdBody=document.getElementById('birdBody');
+const birdMotion=document.getElementById('birdMotion');
+const birdStill=document.getElementById('birdStill');
 const slot=document.getElementById('birdSlot');
 let flight;
-let leftWing;
-let rightWing;
-let bodyMotion;
+let motionFade;
+let stillReveal;
 
 function flyToPosition(){
   if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if(flight) flight.cancel();
-  if(leftWing) leftWing.cancel();
-  if(rightWing) rightWing.cancel();
-  if(bodyMotion) bodyMotion.cancel();
-  const startX=-Math.min(innerWidth*.30,330);
-  const startY=Math.min(innerHeight*.48,400);
-  const duration=6800;
+  if(motionFade) motionFade.cancel();
+  if(stillReveal) stillReveal.cancel();
+  const startX=Math.min(innerWidth*.28,340);
+  const startY=Math.min(innerHeight*.56,470);
+  const duration=7600;
 
-  /* 長弧線接近定位，後半段留給滑翔與自然減速。 */
+  /* 片頭式空間運動：從黑暗遠景接近，只保留兩次克制的側傾。 */
   flight=birdFlight.animate([
-    {transform:`perspective(900px) translate3d(${startX}px,${startY}px,-145px) rotateZ(-11deg) rotateY(-8deg) scale(.48)`,opacity:0,filter:'blur(.6px)',offset:0},
-    {transform:`perspective(900px) translate3d(${startX*.84}px,${startY*.79}px,-112px) rotateZ(-9deg) rotateY(-6deg) scale(.56)`,opacity:.5,filter:'blur(.35px)',offset:.13},
-    {transform:`perspective(900px) translate3d(${startX*.62}px,${startY*.57}px,-78px) rotateZ(-6deg) rotateY(-2deg) scale(.66)`,opacity:.85,filter:'blur(.12px)',offset:.30},
-    {transform:`perspective(900px) translate3d(${startX*.43}px,${startY*.36}px,-48px) rotateZ(-3deg) rotateY(4deg) scale(.76)`,opacity:1,filter:'blur(0)',offset:.47},
-    {transform:`perspective(900px) translate3d(${startX*.26}px,${startY*.20}px,-25px) rotateZ(-1deg) rotateY(5deg) scale(.85)`,opacity:1,filter:'blur(0)',offset:.63},
-    {transform:`perspective(900px) translate3d(${startX*.12}px,${startY*.085}px,-9px) rotateZ(.7deg) rotateY(2deg) scale(.93)`,opacity:1,filter:'blur(0)',offset:.78},
-    {transform:`perspective(900px) translate3d(${startX*.035}px,${startY*.025}px,-2px) rotateZ(-.4deg) rotateY(1deg) scale(.98)`,opacity:1,filter:'blur(0)',offset:.90},
-    {transform:'perspective(900px) translate3d(-2px,3px,0) rotateZ(-.15deg) rotateY(.4deg) scale(.995)',opacity:1,filter:'blur(0)',offset:.965},
-    {transform:'perspective(900px) translate3d(0,0,0) rotateZ(0) rotateY(0) scale(1)',opacity:1,filter:'blur(0)',offset:1}
-  ],{duration,easing:'cubic-bezier(.22,.56,.18,1)',fill:'both'});
+    {transform:`perspective(1200px) translate3d(${startX}px,${startY}px,-420px) rotateZ(-10deg) rotateY(-8deg) scale(.28)`,opacity:0,filter:'blur(3.2px)',offset:0},
+    {transform:`perspective(1200px) translate3d(${startX*.86}px,${startY*.81}px,-330px) rotateZ(-8deg) rotateY(-6deg) scale(.37)`,opacity:.24,filter:'blur(2.4px)',offset:.14},
+    {transform:`perspective(1200px) translate3d(${startX*.66}px,${startY*.60}px,-230px) rotateZ(-5deg) rotateY(-2deg) scale(.51)`,opacity:.58,filter:'blur(1.5px)',offset:.31},
+    {transform:`perspective(1200px) translate3d(${startX*.46}px,${startY*.40}px,-140px) rotateZ(-2deg) rotateY(4deg) scale(.66)`,opacity:.82,filter:'blur(.75px)',offset:.48},
+    {transform:`perspective(1200px) translate3d(${startX*.28}px,${startY*.23}px,-72px) rotateZ(.8deg) rotateY(6deg) scale(.79)`,opacity:.96,filter:'blur(.25px)',offset:.64},
+    {transform:`perspective(1200px) translate3d(${startX*.13}px,${startY*.095}px,-25px) rotateZ(-.7deg) rotateY(2deg) scale(.90)`,opacity:1,filter:'blur(0)',offset:.79},
+    {transform:`perspective(1200px) translate3d(${startX*.035}px,${startY*.022}px,-5px) rotateZ(-.2deg) rotateY(.5deg) scale(.975)`,opacity:1,filter:'blur(0)',offset:.92},
+    {transform:'perspective(1200px) translate3d(0,0,0) rotateZ(0) rotateY(0) scale(1)',opacity:1,filter:'blur(0)',offset:1}
+  ],{duration,easing:'cubic-bezier(.2,.52,.16,1)',fill:'both'});
 
-  /* 不等距、低幅度拍翅：兩次推進後進入長滑翔，避免規律的機械感。 */
-  const leftFrames=[
-    {transform:'rotateX(0deg) rotateZ(0deg)',offset:0},
-    {transform:'rotateX(25deg) rotateZ(-2.4deg) translateY(.5px)',offset:.085},
-    {transform:'rotateX(-4deg) rotateZ(.8deg)',offset:.18},
-    {transform:'rotateX(21deg) rotateZ(-2deg) translateY(.4px)',offset:.285},
-    {transform:'rotateX(-3deg) rotateZ(.6deg)',offset:.40},
-    {transform:'rotateX(12deg) rotateZ(-1deg)',offset:.515},
-    {transform:'rotateX(1deg) rotateZ(0deg)',offset:.62},
-    {transform:'rotateX(-3deg) rotateZ(.6deg) scaleX(1.018)',offset:.76},
-    {transform:'rotateX(-5deg) rotateZ(.8deg) scaleX(1.025)',offset:.87},
-    {transform:'rotateX(-2deg) rotateZ(.3deg) scaleX(1.012)',offset:.95},
-    {transform:'rotateX(0deg) rotateZ(0deg) scaleX(1)',offset:1}
-  ];
-  const rightFrames=leftFrames.map(frame=>({
-    ...frame,
-    transform:frame.transform.replace(/rotateZ\((-?[\d.]+)deg\)/,(_,n)=>`rotateZ(${-Number(n)}deg)`)
-  }));
-  leftWing=birdLeft.animate(leftFrames,{duration,easing:'cubic-bezier(.32,.08,.18,1)',fill:'both'});
-  rightWing=birdRight.animate(rightFrames,{duration:duration+90,easing:'cubic-bezier(.32,.08,.18,1)',fill:'both'});
-
-  bodyMotion=birdBody.animate([
-    {transform:'translateY(.6px) rotateZ(-.5deg)',offset:0},
-    {transform:'translateY(-.7px) rotateZ(.35deg)',offset:.31},
-    {transform:'translateY(.3px) rotateZ(-.18deg)',offset:.60},
-    {transform:'translateY(0) rotateZ(0)',offset:1}
-  ],{duration,easing:'ease-in-out',fill:'both'});
+  /* 抵達時，動態鳥無縫溶接為完全靜止的品牌標誌。 */
+  motionFade=birdMotion.animate([
+    {opacity:1,offset:0},{opacity:1,offset:.86},{opacity:0,offset:1}
+  ],{duration,easing:'cubic-bezier(.45,0,.2,1)',fill:'both'});
+  stillReveal=birdStill.animate([
+    {opacity:0,transform:'scale(.985)',offset:0},
+    {opacity:0,transform:'scale(.985)',offset:.84},
+    {opacity:1,transform:'scale(1)',offset:1}
+  ],{duration,easing:'cubic-bezier(.45,0,.2,1)',fill:'both'});
 }
 
 addEventListener('load',()=>setTimeout(flyToPosition,280),{once:true});
