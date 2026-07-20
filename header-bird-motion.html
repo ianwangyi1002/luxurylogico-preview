@@ -14,9 +14,10 @@ body{overflow:hidden}
 .header-nav a{color:#fff;text-decoration:none;opacity:.92}
 .bird-slot{position:relative;width:54px;height:54px;display:grid;place-items:center;cursor:pointer}
 .bird-flight{width:47px;height:47px;display:grid;place-items:center;transform-origin:50% 50%;transform-style:preserve-3d;will-change:transform,opacity,filter}
-.bird-rig{position:relative;width:47px;height:47px;filter:drop-shadow(0 0 8px rgba(255,255,255,.08))}
+.bird-rig{position:relative;width:47px;height:47px;transform-style:preserve-3d;filter:drop-shadow(0 0 8px rgba(255,255,255,.08))}
 .bird-image{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;will-change:opacity,transform}
-.bird-motion{opacity:1}.bird-still{opacity:0}
+.bird-depth{z-index:0;opacity:.18;filter:blur(.9px) brightness(.45);transform:translate3d(0,2px,-7px)}
+.bird-motion{z-index:2;opacity:1}.bird-still{z-index:3;opacity:0}
 .language{width:150px;text-align:right;font-size:12px;font-weight:300;letter-spacing:.04em;opacity:.85}
 .stage{height:calc(100svh - 96px);background:#000}
 @media(max-width:700px){
@@ -38,6 +39,7 @@ body{overflow:hidden}
     <button class="bird-slot" id="birdSlot" type="button" aria-label="重播天氣鳥進場動畫" style="border:0;background:transparent;padding:0">
       <span class="bird-flight" id="birdFlight">
         <span class="bird-rig" id="birdRig" role="img" aria-label="天氣鳥">
+          <img class="bird-image bird-depth" id="birdDepth" src="weather-bird-still.png" alt="">
           <img class="bird-image bird-motion" id="birdMotion" src="weather-bird-motion.gif" alt="">
           <img class="bird-image bird-still" id="birdStill" src="weather-bird-still.png" alt="">
         </span>
@@ -51,6 +53,7 @@ body{overflow:hidden}
 <script>
 const birdFlight=document.getElementById('birdFlight');
 const birdRig=document.getElementById('birdRig');
+const birdDepth=document.getElementById('birdDepth');
 const birdMotion=document.getElementById('birdMotion');
 const birdStill=document.getElementById('birdStill');
 const slot=document.getElementById('birdSlot');
@@ -95,26 +98,31 @@ function flyToPosition(){
 
     /* 圖像頭部朝上，因此切線角度加 90 度即可始終朝向前進方向。 */
     const heading=Math.atan2(dy,dx)*180/Math.PI+90;
-    const bank=Math.sin(raw*Math.PI*2)*2.2*(1-raw);
+    /* 平面鳥的三軸姿態：pitch 控制俯仰、roll 控制側傾、heading 控制鳥頭方向。 */
+    const pitch=-17*(1-t)+Math.sin(raw*Math.PI*2.2)*3.2*(1-raw);
+    const roll=Math.sin(raw*Math.PI*2.05)*12*Math.pow(1-raw,.68);
+    const yawDrift=Math.sin(raw*Math.PI*1.7)*1.5*(1-raw);
     const scale=.28+.72*t;
-    const depth=-420*(1-t);
+    const depth=-460*Math.pow(1-t,1.12)+Math.sin(raw*Math.PI*1.8)*28*(1-raw);
     const blur=3.2*Math.pow(1-t,1.7);
     const opacity=Math.min(1,raw/.20);
     const settle=Math.max(0,(t-.84)/.16);
 
-    birdFlight.style.transform=`perspective(1200px) translate3d(${x}px,${y}px,${depth}px) rotateZ(${heading+bank}deg) rotateY(${bank*1.5}deg) scale(${scale})`;
+    birdFlight.style.transform=`perspective(1300px) translate3d(${x}px,${y}px,${depth}px) rotateZ(${heading+yawDrift}deg) rotateX(${pitch}deg) rotateY(${roll}deg) scale(${scale})`;
     birdFlight.style.filter=`blur(${blur}px)`;
     birdFlight.style.opacity=String(opacity);
     birdMotion.style.opacity=String(1-settle);
     birdStill.style.opacity=String(settle);
+    birdDepth.style.opacity=String(.20*(1-settle)*(0.55+0.45*t));
 
     if(raw<1){
       flightFrame=requestAnimationFrame(render);
     }else{
-      birdFlight.style.transform='perspective(1200px) translate3d(0,0,0) rotateZ(0deg) rotateY(0deg) scale(1)';
+      birdFlight.style.transform='perspective(1300px) translate3d(0,0,0) rotateZ(0deg) rotateX(0deg) rotateY(0deg) scale(1)';
       birdFlight.style.filter='blur(0)';
       birdMotion.style.opacity='0';
       birdStill.style.opacity='1';
+      birdDepth.style.opacity='0';
     }
   }
   flightFrame=requestAnimationFrame(render);
