@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#050505">
+  <meta name="description" content="豪華朗機工 LuxuryLogico — 組織與成員介紹互動示意">
+  <title>豪華朗機工｜組織介紹測試</title>
+  <style>
+    :root{
+      --bg:#050505;
+      --panel:#0a0a0a;
+      --text:#f2f2f2;
+      --muted:rgba(255,255,255,.48);
+      --faint:rgba(255,255,255,.13);
+      --line:rgba(255,255,255,.2);
+      --pad:clamp(24px,4vw,68px);
+      --ease:cubic-bezier(.22,.61,.36,1);
+    }
+    *{box-sizing:border-box}
+    html{background:var(--bg);scroll-behavior:smooth}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue","Noto Sans TC",Arial,sans-serif;font-weight:300;letter-spacing:.015em;overflow-x:hidden}
+    button,a{color:inherit;font:inherit}
+    button{border:0;background:none;padding:0}
+    a{text-decoration:none}
+    img{display:block;max-width:100%}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+    .site-header{position:fixed;z-index:100;inset:0 0 auto;height:88px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 var(--pad);background:linear-gradient(#050505 30%,rgba(5,5,5,.78) 68%,transparent);transition:background .3s}
+    .brand{width:168px;cursor:pointer}
+    .brand img{width:100%;height:auto}
+    .main-nav{display:flex;align-items:center;gap:38px;font-size:12px;font-weight:300;letter-spacing:.04em}
+    .main-nav a{opacity:.68;transition:opacity .25s}
+    .main-nav a:hover,.main-nav a[aria-current="page"]{opacity:1}
+    .nav-bird{width:36px;height:28px;object-fit:contain;opacity:.75;cursor:pointer;transition:opacity .25s,transform .35s var(--ease)}
+    .nav-bird:hover{opacity:1;transform:translateY(-2px)}
+    .lang{justify-self:end;font-size:10px;letter-spacing:.08em;color:var(--muted)}
+    .menu-button{display:none;justify-self:end;width:32px;height:24px;position:relative;cursor:pointer}
+    .menu-button::before,.menu-button::after{content:"";position:absolute;left:1px;width:29px;height:1px;background:#fff;transition:.3s}
+    .menu-button::before{top:7px}.menu-button::after{top:16px}
+
+    #app{min-height:100vh}
+    .page{min-height:100vh;animation:pageIn .62s var(--ease) both}
+    @keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+    .eyebrow{font-size:10px;color:var(--muted);letter-spacing:.18em;text-transform:uppercase}
+    .hairline{height:1px;background:var(--faint)}
+    .back-button{display:inline-flex;align-items:center;gap:12px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:color .25s}
+    .back-button:hover{color:#fff}
+    .back-button::before{content:"←";font-size:17px;font-weight:200}
+
+    /* Organization */
+    .org-hero{min-height:92vh;display:grid;grid-template-columns:minmax(300px,.78fr) 1.22fr;gap:clamp(34px,7vw,130px);align-items:center;padding:130px var(--pad) 70px}
+    .org-copy{max-width:600px}
+    .org-copy h1{font-size:clamp(52px,7.1vw,126px);line-height:.9;font-weight:300;letter-spacing:-.055em;margin:28px 0 42px}
+    .org-copy h1 span{display:block;font-size:.2em;line-height:1.4;letter-spacing:.08em;margin-top:23px;color:var(--muted);text-transform:uppercase}
+    .org-copy p{max-width:560px;margin:0;font-size:clamp(13px,1.1vw,17px);line-height:2;color:rgba(255,255,255,.69)}
+    .org-meta{display:flex;gap:42px;margin-top:48px;padding-top:20px;border-top:1px solid var(--faint);font-size:10px;color:var(--muted);line-height:1.7;text-transform:uppercase;letter-spacing:.08em}
+    .org-visual{height:min(68vh,760px);min-height:460px;position:relative;overflow:hidden;background:#111}
+    .org-visual img{width:100%;height:100%;object-fit:cover;filter:saturate(.82) brightness(.77);transition:transform 1.4s var(--ease)}
+    .org-visual:hover img{transform:scale(1.018)}
+    .org-visual::after{content:"LuxuryLogico / Collective since 2010";position:absolute;left:22px;right:22px;bottom:18px;padding-top:12px;border-top:1px solid rgba(255,255,255,.35);font-size:9px;letter-spacing:.1em;text-transform:uppercase}
+
+    .directory{padding:90px var(--pad) 130px}
+    .directory-head{display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:22px;border-bottom:1px solid var(--line);margin-bottom:72px}
+    .directory-head h2{font-size:clamp(27px,3vw,48px);font-weight:300;letter-spacing:-.03em;margin:10px 0 0}
+    .directory-head p{font-size:11px;color:var(--muted);margin:0;max-width:270px;line-height:1.7;text-align:right}
+    .member-group + .member-group{margin-top:105px}
+    .group-label{display:grid;grid-template-columns:160px 1fr;gap:30px;align-items:center;margin-bottom:32px}
+    .group-label h3{font-size:13px;font-weight:400;margin:0}
+    .group-label .line{height:1px;background:var(--faint)}
+    .member-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(14px,2vw,34px)}
+    .member-card{text-align:left;cursor:pointer;position:relative;min-width:0}
+    .member-image{aspect-ratio:1/1;overflow:hidden;border-radius:50%;background:#121212;position:relative}
+    .member-image img{width:100%;height:100%;object-fit:cover;filter:grayscale(1) brightness(.54) contrast(1.1);transform:scale(1.08);transition:filter .55s,transform .75s var(--ease),border-radius .6s var(--ease)}
+    .member-image::after{content:"";position:absolute;inset:0;border:1px solid rgba(255,255,255,.16);border-radius:inherit}
+    .member-card:hover .member-image img{filter:grayscale(.25) brightness(.8);transform:scale(1.015)}
+    .member-card:hover .member-image{border-radius:3%}
+    .member-info{display:grid;grid-template-columns:1fr auto;gap:15px;padding-top:17px;border-top:1px solid transparent}
+    .member-info h4{font-size:14px;font-weight:350;margin:0 0 5px}
+    .member-info p{font-size:9px;line-height:1.5;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0}
+    .member-index{font-size:9px;color:var(--muted)}
+    .professional .member-image{border-radius:2%}
+    .professional .member-card:hover .member-image{border-radius:50%}
+
+    /* Profile */
+    .profile-hero{min-height:100vh;display:grid;grid-template-columns:minmax(300px,.7fr) 1.3fr;align-items:stretch;padding-top:88px}
+    .profile-copy{padding:clamp(72px,10vh,120px) var(--pad) 70px;display:flex;flex-direction:column;justify-content:space-between;border-right:1px solid var(--faint)}
+    .profile-name{margin-top:auto;margin-bottom:auto}
+    .profile-name .cn{display:block;font-size:clamp(54px,7vw,112px);font-weight:280;line-height:.98;letter-spacing:-.06em}
+    .profile-name .en{display:block;margin-top:18px;font-size:11px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase}
+    .profile-role{padding-top:20px;border-top:1px solid var(--faint);font-size:10px;line-height:1.8;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+    .profile-visual{height:calc(100vh - 88px);position:sticky;top:88px;overflow:hidden;background:#0c0c0c}
+    .profile-visual img{width:100%;height:100%;object-fit:cover;filter:grayscale(.86) contrast(1.05) brightness(.67);transform:scale(1.02)}
+    .profile-visual::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,5,5,.13),transparent 35%),linear-gradient(0deg,rgba(5,5,5,.48),transparent 35%)}
+    .profile-visual .visual-caption{position:absolute;z-index:1;left:24px;bottom:20px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.7)}
+
+    .profile-body{padding:105px var(--pad) 140px}
+    .profile-about{display:grid;grid-template-columns:1fr 1.45fr;gap:clamp(50px,10vw,170px);padding-bottom:110px}
+    .profile-about h2{font-size:clamp(32px,4vw,60px);font-weight:300;letter-spacing:-.04em;margin:18px 0}
+    .profile-about .bio{font-size:clamp(14px,1.35vw,19px);line-height:2;color:rgba(255,255,255,.7);margin:0;padding-top:22px}
+    .works-head{display:flex;justify-content:space-between;align-items:flex-end;padding:23px 0;border-top:1px solid var(--line)}
+    .works-head h2{font-size:clamp(26px,3vw,46px);font-weight:300;margin:0;letter-spacing:-.035em}
+    .works-head span{font-size:9px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase}
+    .work-list{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(16px,2.4vw,40px);margin-top:48px}
+    .work-card{cursor:pointer;text-align:left}
+    .work-thumb{aspect-ratio:4/5;overflow:hidden;background:#111}
+    .work-thumb img{width:100%;height:100%;object-fit:cover;filter:brightness(.72);transition:filter .45s,transform .75s var(--ease)}
+    .work-card:hover .work-thumb img{filter:brightness(.95);transform:scale(1.025)}
+    .work-meta{display:grid;grid-template-columns:1fr auto;gap:20px;padding-top:15px}
+    .work-meta h3{font-size:13px;font-weight:350;margin:0 0 6px}
+    .work-meta p,.work-meta span{font-size:9px;line-height:1.5;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:0}
+
+    /* Work detail */
+    .work-page{padding-top:88px}
+    .work-detail-head{padding:62px var(--pad) 44px;display:grid;grid-template-columns:1fr 1.2fr;gap:clamp(40px,9vw,150px);align-items:end}
+    .work-title h1{font-size:clamp(46px,7.4vw,128px);font-weight:280;line-height:.91;letter-spacing:-.06em;margin:25px 0 0}
+    .work-intro{display:grid;grid-template-columns:1fr 1fr;gap:30px;padding-bottom:8px}
+    .work-intro p{font-size:11px;line-height:1.85;color:var(--muted);margin:0}
+    .work-hero-image{height:min(76vw,950px);min-height:540px;overflow:hidden;background:#111}
+    .work-hero-image img{width:100%;height:100%;object-fit:cover}
+    .work-detail-body{padding:80px var(--pad) 130px;display:grid;grid-template-columns:.7fr 1.3fr;gap:clamp(45px,12vw,200px)}
+    .work-data{font-size:10px;line-height:2;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+    .work-description{font-size:clamp(15px,1.4vw,20px);line-height:2;color:rgba(255,255,255,.72);max-width:780px}
+    .next-link{margin-top:80px;padding:32px 0;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+    .next-link span:first-child{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
+    .next-link strong{font-size:clamp(22px,3vw,42px);font-weight:300}
+
+    @media(max-width:900px){
+      :root{--pad:22px}
+      .site-header{height:72px;grid-template-columns:1fr auto 1fr;padding-bottom:3px;background:#050505}
+      .brand{width:132px}
+      .main-nav{position:static;gap:0}.main-nav a{display:none}.nav-bird{width:27px;height:22px}
+      .lang{display:none}.menu-button{display:block}
+      .org-hero{grid-template-columns:1fr;gap:42px;min-height:auto;padding-top:125px}
+      .org-copy h1{font-size:58px;margin:24px 0 32px}
+      .org-visual{height:55vh;min-height:420px}
+      .directory{padding-top:72px}
+      .directory-head{align-items:flex-start;flex-direction:column;gap:18px;margin-bottom:52px}
+      .directory-head p{text-align:left}
+      .group-label{grid-template-columns:120px 1fr}
+      .member-grid{grid-template-columns:repeat(2,1fr);gap:40px 16px}
+      .profile-hero{grid-template-columns:1fr;padding-top:72px}
+      .profile-copy{min-height:56vh;border-right:0;padding-top:55px}
+      .profile-visual{position:relative;top:0;height:64vh}
+      .profile-about{grid-template-columns:1fr;gap:25px}
+      .work-list{grid-template-columns:1fr 1fr}
+      .work-detail-head{grid-template-columns:1fr;gap:46px;padding-top:48px}
+      .work-intro{max-width:600px}
+      .work-detail-body{grid-template-columns:1fr;gap:40px}
+    }
+    @media(max-width:560px){
+      .org-meta{gap:20px;flex-wrap:wrap}.org-visual{height:52vh;min-height:360px}
+      .directory{padding-bottom:90px}.member-group + .member-group{margin-top:78px}
+      .member-grid{gap:34px 14px}.member-info{grid-template-columns:1fr}.member-index{display:none}
+      .profile-copy{min-height:50vh}.profile-name .cn{font-size:58px}
+      .profile-visual{height:58vh}
+      .profile-body{padding-top:76px}.profile-about{padding-bottom:80px}
+      .work-list{grid-template-columns:1fr;gap:46px}.work-thumb{aspect-ratio:4/4.7}
+      .work-detail-head{padding-bottom:34px}.work-title h1{font-size:52px}
+      .work-intro{grid-template-columns:1fr;gap:14px}.work-hero-image{height:67vh;min-height:480px}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.page{animation:none}*{transition-duration:.01ms!important}}
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <button class="brand" type="button" data-route="organization" aria-label="回到組織介紹">
+      <img src="assets/embedded-7d630d246b0b.png" alt="豪華朗機工 LuxuryLogico">
+    </button>
+    <nav class="main-nav" aria-label="主要選單">
+      <a href="./index.html">Works</a>
+      <img class="nav-bird" src="assets/embedded-cacb32ca5c6c.png" alt="天氣鳥" data-route="organization">
+      <a href="#organization" aria-current="page">About</a>
+    </nav>
+    <div class="lang">CN / EN</div>
+    <button class="menu-button" type="button" aria-label="選單"></button>
+  </header>
+
+  <main id="app" tabindex="-1"></main>
+
+  <script>
+    const A='assets/';
+    const images={
+      birds:A+'embedded-21c46f4093a5.jpg',
+      light:A+'embedded-40e23b1a781f.jpg',
+      hand:A+'embedded-e993987c439f.png',
+      archive:A+'embedded-ccab87a27545.jpg',
+      route:A+'embedded-31c19999a4d3.png',
+      sea:A+'embedded-b8e778877b76.jpg'
+    };
+
+    const works={
+      'sun-domain':{title:'日光域 XI',en:'SUN DOMAIN XI',year:'2010—2025',place:'台北當代藝術館',medium:'聲光裝置／複合媒材',image:images.light,description:'以光作為具有時間性的媒材，透過模組化發光單元與觀者的位置關係，讓空間中的亮度、節奏與觀看距離持續改變。作品在科技與感知之間建立一個可以被身體經驗的光域。'},
+      'weather-bird':{title:'天氣好不好我們都要飛',en:'WEATHER OR NOT, WE FLY',year:'2011—2025',place:'巡迴展演',medium:'動力裝置／聲音／影像',image:images.birds,description:'天氣鳥在不同時間與場域持續變形，將機械、聲音與集體協作轉化為一個會呼吸的意象。它既是豪華朗機工的代表符號，也是面對環境變化仍持續前行的共同姿態。'},
+      'algorithm-harmony':{title:'演算法和諧',en:'ALGORITHMIC HARMONY',year:'2025',place:'SOMA Berlin',medium:'機械裝置／生成影像',image:images.hand,description:'以機械手臂、演算法與光環境組成持續變動的系統，探索人與機器之間的協作、控制與不確定性。每一次動作都由既定規則出發，卻在現場生成不同的節奏。'},
+      'floating-archive':{title:'宇宙寫生',en:'COSMIC SKETCHING',year:'2025',place:'台北當代藝術館',medium:'裝置／繪畫／影像',image:images.archive,description:'將日常材料、身體經驗與想像中的宇宙共同置入展場。作品不試圖給出單一答案，而是以多個彼此牽引的物件，形成可以被自由閱讀的敘事場。'},
+      'perpetual-realm':{title:'永動之境',en:'PERPETUAL REALM',year:'2024',place:'臺北大巨蛋',medium:'公共藝術／動力裝置',image:images.route,description:'以循環、流動與城市節奏為核心，讓光線與結構形成不斷延伸的運動軌跡。作品回應大型公共空間中的人流，也保留觀看者停下來感受時間的空隙。'},
+      'spectrum':{title:'台灣光譜',en:'SPECTRUM OF TAIWAN',year:'2025',place:'大阪・台灣文化中心',medium:'策展／跨域展演',image:images.sea,description:'透過聲音、影像、裝置與現場展演建立多層次的文化切面。策展以光譜作為方法，讓不同世代與媒材的創作並置，呈現持續流動的台灣感知。'}
+    };
+
+    const members={
+      genghao:{name:'張耿豪',en:'Chang Keng-Hao',role:'Sculpture / Mechanical Installation',group:'豪華朗機工',image:images.hand,bio:'豪華朗機工共同創辦人。創作關注雕塑、機械結構與物件在空間中的動態關係，擅長將工程邏輯轉譯為具身體感的裝置經驗。',works:['algorithm-harmony','perpetual-realm','sun-domain']},
+      genghua:{name:'張耿華',en:'Chang Keng-Hua',role:'Visual Arts / Cross-disciplinary Direction',group:'豪華朗機工',image:images.light,bio:'豪華朗機工共同創辦人。以視覺藝術與跨域整合為主要工作方向，在集體創作中協調形式、敘事與空間感，使不同媒材形成一致的觀看節奏。',works:['sun-domain','weather-bird','floating-archive']},
+      yi:{name:'陳乂',en:'Chen Yi',role:'Spatial Image / Generative Systems',group:'豪華朗機工',image:images.route,bio:'豪華朗機工共同創辦人。專長空間影像、程式與生成系統，持續探索科技媒材如何回應場域，並在影像、機械與觀眾之間建立即時關係。',works:['algorithm-harmony','sun-domain','spectrum']},
+      kunying:{name:'林昆穎',en:'Lin Kun-Ying',role:'Sound / Curation / Direction',group:'豪華朗機工',image:images.birds,bio:'豪華朗機工共同創辦人。工作橫跨聲音、策劃與編導，關注展演節奏與敘事結構，讓聲音成為串連作品、空間與觀眾的重要線索。',works:['spectrum','weather-bird','floating-archive']},
+      hongci:{name:'黃虹慈',en:'Huang Hung-Tzu',role:'Project Management / Production',group:'專業成員',image:images.archive,bio:'參與團隊專案管理與製作協調，負責將前期概念、場域需求與執行資源整合為可落地的製作流程。',works:['floating-archive','perpetual-realm','spectrum']},
+      weiyu:{name:'葉韋鈺',en:'Yeh Wei-Yu',role:'Visual Design / Coordination',group:'專業成員',image:images.sea,bio:'參與視覺設計與跨部門協作，協助團隊將作品概念延伸至展覽識別、內容編排與現場溝通。',works:['spectrum','sun-domain','weather-bird']},
+      honghao:{name:'黃弘豪',en:'Huang Hung-Hao',role:'Technical Production',group:'專業成員',image:images.light,bio:'負責裝置技術製作與現場整合，協助機械、燈光、控制系統與展場條件之間保持穩定而精確的運作。',works:['algorithm-harmony','perpetual-realm','sun-domain']}
+    };
+
+    function memberCard(id,index,professional=false){
+      const m=members[id];
+      return `<button class="member-card ${professional?'professional':''}" type="button" data-member="${id}" aria-label="查看 ${m.name} 個人頁面">
+        <div class="member-image"><img src="${m.image}" alt="${m.name} 成員示意"></div>
+        <div class="member-info"><div><h4>${m.name}</h4><p>${m.role}</p></div><span class="member-index">${String(index+1).padStart(2,'0')}</span></div>
+      </button>`;
+    }
+
+    function workCard(id,index){
+      const w=works[id];
+      return `<button class="work-card" type="button" data-work="${id}" aria-label="查看作品 ${w.title}">
+        <div class="work-thumb"><img src="${w.image}" alt="${w.title}"></div>
+        <div class="work-meta"><div><h3>${w.title}</h3><p>${w.en}<br>${w.medium}</p></div><span>${w.year}<br>${String(index+1).padStart(2,'0')}</span></div>
+      </button>`;
+    }
+
+    function organizationView(){
+      const core=['genghao','genghua','yi','kunying'];
+      const pros=['hongci','weiyu','honghao'];
+      return `<section class="page organization-page">
+        <div class="org-hero">
+          <div class="org-copy">
+            <div class="eyebrow">About / Organization / 01</div>
+            <h1>豪華<br>朗機工<span>LuxuryLogico</span></h1>
+            <p>成軍於 2010 年，豪華朗機工由四位藝術家共同組成，以混種跨域為創作方法，讓音樂、視覺、機械裝置與文本彼此作用。每件作品從場域出發，透過集體協作形成持續變動的感知經驗。</p>
+            <div class="org-meta"><span>Based in Taipei<br>Taiwan</span><span>Collective since<br>2010</span><span>Art / Technology<br>Site-specific</span></div>
+          </div>
+          <div class="org-visual"><img src="${images.light}" alt="豪華朗機工作品空間"></div>
+        </div>
+        <div class="directory" id="members">
+          <div class="directory-head"><div><div class="eyebrow">Organization / Members</div><h2>組織與成員</h2></div><p>點選成員進入個人頁面，向下查看其參與的團隊作品。</p></div>
+          <section class="member-group"><div class="group-label"><h3>豪華朗機工</h3><div class="line"></div></div><div class="member-grid">${core.map((id,i)=>memberCard(id,i)).join('')}</div></section>
+          <section class="member-group"><div class="group-label"><h3>專業成員</h3><div class="line"></div></div><div class="member-grid">${pros.map((id,i)=>memberCard(id,i,true)).join('')}</div></section>
+        </div>
+      </section>`;
+    }
+
+    function profileView(id){
+      const m=members[id]||members.genghao;
+      return `<section class="page profile-page">
+        <div class="profile-hero">
+          <div class="profile-copy"><button class="back-button" data-route="organization" type="button">Organization</button>
+            <div class="profile-name"><div class="eyebrow">${m.group} / Member</div><span class="cn">${m.name}</span><span class="en">${m.en}</span></div>
+            <div class="profile-role">${m.role}<br>LuxuryLogico / Taipei</div>
+          </div>
+          <div class="profile-visual"><img src="${m.image}" alt="${m.name} 個人頁面示意"><div class="visual-caption">Member profile / ${m.en}</div></div>
+        </div>
+        <div class="profile-body">
+          <section class="profile-about"><div><div class="eyebrow">Profile / 01</div><h2>成員介紹</h2></div><p class="bio">${m.bio}</p></section>
+          <section class="selected-works"><div class="works-head"><h2>團隊作品履歷</h2><span>Selected works / ${String(m.works.length).padStart(2,'0')}</span></div><div class="work-list">${m.works.map((wid,i)=>workCard(wid,i)).join('')}</div></section>
+        </div>
+      </section>`;
+    }
+
+    function workView(id,memberId){
+      const w=works[id]||works['sun-domain'];
+      const m=members[memberId]||members.genghao;
+      const ids=Object.keys(works),next=works[ids[(ids.indexOf(id)+1)%ids.length]],nextId=ids[(ids.indexOf(id)+1)%ids.length];
+      return `<section class="page work-page">
+        <div class="work-detail-head"><div class="work-title"><button class="back-button" type="button" data-member="${memberId}">${m.name} / Selected Works</button><div class="eyebrow" style="margin-top:44px">${w.year} / ${w.medium}</div><h1>${w.title}</h1></div>
+          <div class="work-intro"><p>${w.en}<br>${w.place}</p><p>${w.year}<br>${w.medium}</p></div></div>
+        <div class="work-hero-image"><img src="${w.image}" alt="${w.title}"></div>
+        <div class="work-detail-body"><div class="work-data">Artist / LuxuryLogico<br>Member / ${m.name}<br>Year / ${w.year}<br>Site / ${w.place}</div><div><div class="work-description">${w.description}</div><button class="next-link" type="button" data-work="${nextId}" data-from="${memberId}"><span>Next work</span><strong>${next.title} →</strong></button></div></div>
+      </section>`;
+    }
+
+    const app=document.getElementById('app');
+    function parseRoute(){
+      const raw=location.hash.replace(/^#/,'')||'organization';
+      const [view,id,from]=raw.split('/');
+      return {view,id,from};
+    }
+    function go(route){
+      if(location.hash==='#'+route){render();return}
+      location.hash=route;
+    }
+    function render(){
+      const r=parseRoute();
+      if(r.view==='member') app.innerHTML=profileView(r.id);
+      else if(r.view==='work') app.innerHTML=workView(r.id,r.from||'genghao');
+      else app.innerHTML=organizationView();
+      window.scrollTo({top:0,left:0,behavior:'auto'});
+      app.focus({preventScroll:true});
+    }
+    document.addEventListener('click',e=>{
+      const member=e.target.closest('[data-member]');
+      const work=e.target.closest('[data-work]');
+      const route=e.target.closest('[data-route]');
+      if(member){go('member/'+member.dataset.member);return}
+      if(work){const from=work.dataset.from||parseRoute().id||'genghao';go('work/'+work.dataset.work+'/'+from);return}
+      if(route){go(route.dataset.route)}
+    });
+    window.addEventListener('hashchange',render);
+    render();
+  </script>
+</body>
+</html>
