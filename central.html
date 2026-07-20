@@ -70,10 +70,11 @@ main{width:100%;height:100vh;position:relative;display:flex;align-items:center}
   .gallery-viewport{top:36vh;height:48vh;perspective:900px}
   .focus-marker{left:50%}
   .gallery{padding-left:50vw;padding-right:62vw}
-  .card{width:min(68vw,270px);height:42vh;max-height:420px;margin-left:-20vw;box-shadow:none;transition:opacity .18s ease,filter .18s ease}
+  .card{width:min(68vw,270px);height:42vh;max-height:420px;margin-left:-20vw;box-shadow:none;transition:opacity .12s linear;contain:layout paint;will-change:transform,opacity}
   .card:first-child{margin-left:0}
   .card.active{width:min(68vw,270px);height:42vh;max-height:420px}
-  .card.active{box-shadow:0 16px 34px rgba(0,0,0,.45)}
+  .card.active{box-shadow:none}
+  .card img,.card.active img,.card:hover img{filter:none;transition:none;transform:translateZ(0)}
   .explore-button{right:18px;bottom:24px;width:72px;height:72px}
   .explore-button img{width:31px;height:31px}
   .spark{right:14px;top:10px;font-size:23px}
@@ -223,11 +224,18 @@ let startX = 0;
 let startOffset = 0;
 let velocity = 0;
 let lastX = 0;
+let lastMoveTime = 0;
 let raf = null;
 let dragFrame = null;
+let cardCenters = new Map();
 
 function focusX(){ return window.innerWidth * .5; }
-function cardCenterX(card){ return card.offsetLeft + card.offsetWidth / 2 + offset; }
+function rebuildCardCenters(){
+  cardCenters = new Map(cards.map(card => [card, card.offsetLeft + card.offsetWidth / 2]));
+}
+function cardCenterX(card){
+  return (cardCenters.get(card) ?? (card.offsetLeft + card.offsetWidth / 2)) + offset;
+}
 
 function bounds(){
   const first = cards[0];
@@ -297,10 +305,13 @@ function updateActive(){
 function animateInertia(){
   cancelAnimationFrame(raf);
   const tick = () => {
+    if(dragging) return;
     if(Math.abs(velocity) < .2) return snapToActive();
     offset += velocity;
+    const rawOffset = offset;
     velocity *= .92;
     clamp();
+    if(offset !== rawOffset) velocity = 0;
     render();
     raf = requestAnimationFrame(tick);
   };
@@ -334,8 +345,12 @@ viewport.addEventListener('wheel', e => {
 }, {passive:false});
 
 viewport.addEventListener('pointerdown', e => {
+  cancelAnimationFrame(raf);
+  raf = null;
+  if(dragFrame){ cancelAnimationFrame(dragFrame); dragFrame = null; }
   dragging = true;
   startX = lastX = e.clientX;
+  lastMoveTime = e.timeStamp;
   startOffset = offset;
   velocity = 0;
   viewport.setPointerCapture(e.pointerId);
@@ -343,9 +358,13 @@ viewport.addEventListener('pointerdown', e => {
 
 viewport.addEventListener('pointermove', e => {
   if(!dragging) return;
-  const dx = e.clientX - startX;
-  velocity = e.clientX - lastX;
-  lastX = e.clientX;
+  const samples = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+  const point = samples[samples.length - 1] || e;
+  const dx = point.clientX - startX;
+  const elapsed = Math.max(1, point.timeStamp - lastMoveTime);
+  velocity = (point.clientX - lastX) / elapsed * 16.67;
+  lastX = point.clientX;
+  lastMoveTime = point.timeStamp;
   offset = startOffset + dx;
   clamp();
   if(!dragFrame){
@@ -374,8 +393,9 @@ cards.forEach(card => card.addEventListener('click', () => {
   snapToActive();
 }));
 
-window.addEventListener('resize', () => { clamp(); render(); });
+window.addEventListener('resize', () => { rebuildCardCenters(); clamp(); render(); });
 setTimeout(() => { 
+  rebuildCardCenters();
   const active = document.querySelector('.card.active');
   offset += focusX() - cardCenterX(active);
   render();
@@ -458,6 +478,7 @@ aiInput.onkeydown=e=>{if(e.key==='Enter')submit()};
     const first = cards[0];
     cards.forEach((card, i) => card.classList.toggle('active', i === 0));
     void first.offsetWidth;
+    rebuildCardCenters();
 
     // Put the first card at the focus point, then re-measure after its 3D state settles.
     offset = bounds().max;
