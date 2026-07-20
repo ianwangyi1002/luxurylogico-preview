@@ -54,40 +54,70 @@ const birdRig=document.getElementById('birdRig');
 const birdMotion=document.getElementById('birdMotion');
 const birdStill=document.getElementById('birdStill');
 const slot=document.getElementById('birdSlot');
-let flight;
-let motionFade;
-let stillReveal;
+let flightFrame=0;
+
+function bezier(p0,p1,p2,p3,t){
+  const u=1-t;
+  return u*u*u*p0+3*u*u*t*p1+3*u*t*t*p2+t*t*t*p3;
+}
+
+function bezierTangent(p0,p1,p2,p3,t){
+  const u=1-t;
+  return 3*u*u*(p1-p0)+6*u*t*(p2-p1)+3*t*t*(p3-p2);
+}
+
+function smootherstep(t){
+  return t*t*t*(t*(t*6-15)+10);
+}
 
 function flyToPosition(){
   if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  if(flight) flight.cancel();
-  if(motionFade) motionFade.cancel();
-  if(stillReveal) stillReveal.cancel();
+  cancelAnimationFrame(flightFrame);
   const startX=Math.min(innerWidth*.28,340);
   const startY=Math.min(innerHeight*.56,470);
-  const duration=7600;
+  const duration=7200;
+  const p0={x:startX,y:startY};
+  const p1={x:startX*.70,y:startY*.76};
+  const p2={x:0,y:startY*.19};
+  const p3={x:0,y:0};
+  const began=performance.now();
 
-  /* 片頭式空間運動：從黑暗遠景接近，只保留兩次克制的側傾。 */
-  flight=birdFlight.animate([
-    {transform:`perspective(1200px) translate3d(${startX}px,${startY}px,-420px) rotateZ(-10deg) rotateY(-8deg) scale(.28)`,opacity:0,filter:'blur(3.2px)',offset:0},
-    {transform:`perspective(1200px) translate3d(${startX*.86}px,${startY*.81}px,-330px) rotateZ(-8deg) rotateY(-6deg) scale(.37)`,opacity:.24,filter:'blur(2.4px)',offset:.14},
-    {transform:`perspective(1200px) translate3d(${startX*.66}px,${startY*.60}px,-230px) rotateZ(-5deg) rotateY(-2deg) scale(.51)`,opacity:.58,filter:'blur(1.5px)',offset:.31},
-    {transform:`perspective(1200px) translate3d(${startX*.46}px,${startY*.40}px,-140px) rotateZ(-2deg) rotateY(4deg) scale(.66)`,opacity:.82,filter:'blur(.75px)',offset:.48},
-    {transform:`perspective(1200px) translate3d(${startX*.28}px,${startY*.23}px,-72px) rotateZ(.8deg) rotateY(6deg) scale(.79)`,opacity:.96,filter:'blur(.25px)',offset:.64},
-    {transform:`perspective(1200px) translate3d(${startX*.13}px,${startY*.095}px,-25px) rotateZ(-.7deg) rotateY(2deg) scale(.90)`,opacity:1,filter:'blur(0)',offset:.79},
-    {transform:`perspective(1200px) translate3d(${startX*.035}px,${startY*.022}px,-5px) rotateZ(-.2deg) rotateY(.5deg) scale(.975)`,opacity:1,filter:'blur(0)',offset:.92},
-    {transform:'perspective(1200px) translate3d(0,0,0) rotateZ(0) rotateY(0) scale(1)',opacity:1,filter:'blur(0)',offset:1}
-  ],{duration,easing:'cubic-bezier(.2,.52,.16,1)',fill:'both'});
+  birdMotion.style.opacity='1';
+  birdStill.style.opacity='0';
 
-  /* 抵達時，動態鳥無縫溶接為完全靜止的品牌標誌。 */
-  motionFade=birdMotion.animate([
-    {opacity:1,offset:0},{opacity:1,offset:.86},{opacity:0,offset:1}
-  ],{duration,easing:'cubic-bezier(.45,0,.2,1)',fill:'both'});
-  stillReveal=birdStill.animate([
-    {opacity:0,transform:'scale(.985)',offset:0},
-    {opacity:0,transform:'scale(.985)',offset:.84},
-    {opacity:1,transform:'scale(1)',offset:1}
-  ],{duration,easing:'cubic-bezier(.45,0,.2,1)',fill:'both'});
+  function render(now){
+    const raw=Math.min(1,(now-began)/duration);
+    const t=smootherstep(raw);
+    const x=bezier(p0.x,p1.x,p2.x,p3.x,t);
+    const y=bezier(p0.y,p1.y,p2.y,p3.y,t);
+    const dx=bezierTangent(p0.x,p1.x,p2.x,p3.x,t);
+    const dy=bezierTangent(p0.y,p1.y,p2.y,p3.y,t);
+
+    /* 圖像頭部朝上，因此切線角度加 90 度即可始終朝向前進方向。 */
+    const heading=Math.atan2(dy,dx)*180/Math.PI+90;
+    const bank=Math.sin(raw*Math.PI*2)*2.2*(1-raw);
+    const scale=.28+.72*t;
+    const depth=-420*(1-t);
+    const blur=3.2*Math.pow(1-t,1.7);
+    const opacity=Math.min(1,raw/.20);
+    const settle=Math.max(0,(t-.84)/.16);
+
+    birdFlight.style.transform=`perspective(1200px) translate3d(${x}px,${y}px,${depth}px) rotateZ(${heading+bank}deg) rotateY(${bank*1.5}deg) scale(${scale})`;
+    birdFlight.style.filter=`blur(${blur}px)`;
+    birdFlight.style.opacity=String(opacity);
+    birdMotion.style.opacity=String(1-settle);
+    birdStill.style.opacity=String(settle);
+
+    if(raw<1){
+      flightFrame=requestAnimationFrame(render);
+    }else{
+      birdFlight.style.transform='perspective(1200px) translate3d(0,0,0) rotateZ(0deg) rotateY(0deg) scale(1)';
+      birdFlight.style.filter='blur(0)';
+      birdMotion.style.opacity='0';
+      birdStill.style.opacity='1';
+    }
+  }
+  flightFrame=requestAnimationFrame(render);
 }
 
 addEventListener('load',()=>setTimeout(flyToPosition,280),{once:true});
