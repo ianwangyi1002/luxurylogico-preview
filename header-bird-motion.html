@@ -91,13 +91,13 @@ function phase(from,to,value){
 function flyToPosition(){
   if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   cancelAnimationFrame(flightFrame);
-  const startX=-Math.min(innerWidth*.18,220);
-  const startY=Math.min(innerHeight*.58,500);
+  const startX=Math.min(innerWidth*.16,190);
+  const startY=-Math.min(innerHeight*.48,420);
   const curveX=Math.min(innerWidth*.15,180);
   const duration=6200;
   const p0={x:startX,y:startY};
-  const p1={x:curveX,y:startY*.72};
-  const p2={x:-curveX*.30,y:startY*.20};
+  const p1={x:-curveX*.72,y:startY*.70};
+  const p2={x:curveX*.22,y:startY*.16};
   const p3={x:0,y:0};
   const began=performance.now();
   let previousTime=began;
@@ -122,9 +122,10 @@ function flyToPosition(){
     const pitch=-27*(1-t)+Math.sin(raw*Math.PI*2.4)*4.5*(1-raw);
     const roll=Math.sin(raw*Math.PI*2.35)*18*Math.pow(1-raw,.62);
     const yawDrift=Math.sin(raw*Math.PI*2.1)*2.2*(1-raw);
-    const scale=.16+.84*t;
-    const depth=-900*Math.pow(1-t,1.08)+Math.sin(raw*Math.PI*2.1)*42*(1-raw);
-    const blur=4.4*Math.pow(1-t,1.6);
+    /* 從上方以大尺寸進場，下降至 Header 定位時逐步縮回標準尺寸。 */
+    const scale=1+1.38*Math.pow(1-t,1.16);
+    const depth=210*Math.pow(1-t,1.18)+Math.sin(raw*Math.PI*2.1)*24*(1-raw);
+    const blur=1.2*Math.pow(1-t,1.7);
     const opacity=Math.min(1,raw/.15);
     /* 拍翅不是等速循環，而是三段有呼吸的節奏：起飛、轉向、煞停。 */
     const launch=1-phase(.12,.25,raw);
