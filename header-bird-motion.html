@@ -60,20 +60,20 @@ function flyToPosition(){
 
   /* 大弧線飛入：先從左下遠處起飛，中段抬升，最後繞一個小弧減速停靠。 */
   flight=birdFlight.animate([
-    {transform:`translate3d(${startX}px,${startY}px,0) rotate(-18deg) scale(.48)`,opacity:0,offset:0},
-    {transform:`translate3d(${startX*.88}px,${startY*.76}px,0) rotate(-12deg) scale(.58)`,opacity:.72,offset:.10},
-    {transform:`translate3d(${startX*.72}px,${startY*.42}px,0) rotate(-5deg) scale(.69)`,opacity:1,offset:.23},
-    {transform:`translate3d(${startX*.54}px,${-startY*.08}px,0) rotate(10deg) scale(.80)`,opacity:1,offset:.37},
-    {transform:`translate3d(${startX*.38}px,${-startY*.22}px,0) rotate(15deg) scale(.88)`,opacity:1,offset:.50},
-    {transform:`translate3d(${startX*.22}px,${-startY*.12}px,0) rotate(4deg) scale(.95)`,opacity:1,offset:.63},
-    {transform:`translate3d(${startX*.09}px,18px,0) rotate(-11deg) scale(1.03)`,opacity:1,offset:.75},
-    {transform:'translate3d(20px,-13px,0) rotate(9deg) scale(1.07)',opacity:1,offset:.84},
-    {transform:'translate3d(7px,5px,0) rotate(-4deg) scale(1.025)',opacity:1,offset:.91},
-    {transform:'translate3d(-3px,-2px,0) rotate(1.5deg) scale(.99)',opacity:1,offset:.965},
+    {transform:`translate3d(${startX}px,${startY}px,0) rotate(72deg) scale(.48)`,opacity:0,offset:0},
+    {transform:`translate3d(${startX*.88}px,${startY*.76}px,0) rotate(68deg) scale(.58)`,opacity:.72,offset:.10},
+    {transform:`translate3d(${startX*.72}px,${startY*.42}px,0) rotate(62deg) scale(.69)`,opacity:1,offset:.23},
+    {transform:`translate3d(${startX*.54}px,${-startY*.08}px,0) rotate(76deg) scale(.80)`,opacity:1,offset:.37},
+    {transform:`translate3d(${startX*.38}px,${-startY*.22}px,0) rotate(88deg) scale(.88)`,opacity:1,offset:.50},
+    {transform:`translate3d(${startX*.22}px,${-startY*.12}px,0) rotate(78deg) scale(.95)`,opacity:1,offset:.63},
+    {transform:`translate3d(${startX*.09}px,18px,0) rotate(58deg) scale(1.03)`,opacity:1,offset:.75},
+    {transform:'translate3d(20px,-13px,0) rotate(34deg) scale(1.06)',opacity:1,offset:.84},
+    {transform:'translate3d(7px,5px,0) rotate(15deg) scale(1.025)',opacity:1,offset:.91},
+    {transform:'translate3d(-3px,-2px,0) rotate(4deg) scale(.99)',opacity:1,offset:.965},
     {transform:'translate3d(0,0,0) rotate(0deg) scale(1)',opacity:1,offset:1}
   ],{
-    duration:2650,
-    easing:'cubic-bezier(.18,.62,.2,1)',
+    duration:4200,
+    easing:'cubic-bezier(.25,.55,.18,1)',
     fill:'both'
   });
 
@@ -89,7 +89,7 @@ function flyToPosition(){
     {transform:'scaleX(1.025) scaleY(1.035) rotate(1deg)',offset:.78},
     {transform:'scaleX(.98) scaleY(.92) rotate(-.5deg)',offset:.89},
     {transform:'scaleX(1) scaleY(1) rotate(0)',offset:1}
-  ],{duration:2650,easing:'ease-in-out',fill:'both'});
+  ],{duration:4200,easing:'cubic-bezier(.42,0,.3,1)',fill:'both'});
   flight.onfinish=()=>bird.classList.add('arrived');
 }
 
