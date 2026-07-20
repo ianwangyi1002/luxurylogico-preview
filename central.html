@@ -11,7 +11,7 @@ body{position:relative}
 header{position:fixed;inset:0 0 auto;height:90px;display:flex;align-items:center;justify-content:space-between;padding:0 3.5vw;z-index:50;background:linear-gradient(#000e,#0000)}
 .brand{display:flex;align-items:center}.brand img{width:118px;height:auto;display:block}
 nav{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:46px;align-items:center;font-size:13px}
-.nav-bird{width:54px;height:54px;object-fit:contain}
+.nav-bird{width:54px;height:54px;object-fit:contain;cursor:pointer}
 .language{font-size:11px}
 main{width:100%;height:100vh;position:relative;display:flex;align-items:center}
 .project-info{position:absolute;left:50%;top:17vh;transform:translateX(-50%);width:min(70vw,900px);z-index:10;text-align:center;font-family:Arial,"Noto Sans TC",sans-serif;pointer-events:none}
@@ -507,5 +507,8 @@ aiInput.onkeydown=e=>{if(e.key==='Enter')submit()};
 })();
 </script>
 
+<script>
+document.querySelector('.nav-bird')?.addEventListener('click',()=>{window.location.href='search.html?from=mobile'});
+</script>
 </body>
 </html>

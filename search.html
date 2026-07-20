@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07070a">
+  <meta name="description" content="豪華朗機工 LuxuryLogico 天氣鳥搜尋頁互動示意">
+  <title>豪華朗機工｜天氣鳥搜尋測試</title>
+  <style>
+    :root{--bg:#08090d;--text:#f5f5f7;--muted:rgba(255,255,255,.54);--line:rgba(255,255,255,.15);--violet:#8b5cff;--ease:cubic-bezier(.22,.61,.36,1)}
+    *{box-sizing:border-box}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue","Noto Sans TC",Arial,sans-serif}
+    body{min-height:100svh;overflow-x:hidden;background:radial-gradient(ellipse 55% 48% at 50% 67%,rgba(47,63,168,.24),transparent 70%),#090a0e}
+    button,input{font:inherit;color:inherit}
+    button{cursor:pointer}
+    .header{position:fixed;z-index:20;inset:0 0 auto;height:88px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 clamp(26px,4vw,68px);background:linear-gradient(#08090e 34%,rgba(8,9,14,.75) 68%,transparent)}
+    .brand{width:166px}.brand img{display:block;width:100%;height:auto}
+    .header-nav{display:flex;align-items:center;gap:38px;font-size:12px;color:rgba(255,255,255,.7)}
+    .header-nav a{color:inherit;text-decoration:none}.header-nav .bird{width:38px;height:29px;object-fit:contain;filter:brightness(1.25)}
+    .lang{justify-self:end;font-size:10px;color:var(--muted);letter-spacing:.08em}
+    .back{display:none}
+    main{min-height:100svh;display:grid;place-items:center;padding:130px 24px 80px}
+    .search-stage{width:min(900px,100%);display:flex;flex-direction:column;align-items:center;position:relative}
+    .search-stage::before{content:"";position:absolute;left:50%;top:48%;width:min(960px,105vw);height:460px;transform:translate(-50%,-15%);background:radial-gradient(ellipse,rgba(65,78,190,.27),transparent 69%);filter:blur(22px);pointer-events:none}
+    .intro-shell{width:min(610px,76vw);padding:28px;background:rgba(12,12,15,.76);border:1px solid rgba(255,255,255,.025);box-shadow:0 35px 90px rgba(0,0,0,.32);position:relative;z-index:1}
+    .intro-card{min-height:405px;padding:74px clamp(46px,7vw,92px) 58px;background:linear-gradient(145deg,#050506,#0b0b0d);border:1px solid rgba(255,255,255,.035);display:flex;flex-direction:column;justify-content:center;align-items:flex-start}
+    .bird-mark{position:relative;align-self:center;width:78px;height:58px;margin-bottom:35px}
+    .bird-mark img{width:100%;height:100%;object-fit:contain;filter:brightness(1.5)}
+    .spark{position:absolute;right:-14px;top:-12px;width:17px;height:17px;transform:rotate(45deg);background:var(--violet);clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);filter:drop-shadow(0 0 8px rgba(139,92,255,.7));animation:spark 2.8s ease-in-out infinite}
+    @keyframes spark{50%{transform:rotate(75deg) scale(.75);opacity:.65}}
+    h1{font-size:clamp(30px,3vw,42px);font-weight:390;letter-spacing:-.035em;margin:0 0 26px}
+    .intro-card p{font-size:clamp(15px,1.3vw,19px);line-height:1.85;color:rgba(255,255,255,.68);margin:0}
+    .search-form{position:relative;z-index:2;width:min(760px,88vw);height:76px;margin-top:10px;border:1px solid rgba(255,255,255,.06);border-radius:999px;background:#242426;display:grid;grid-template-columns:52px 1fr auto;align-items:center;padding:0 22px;box-shadow:0 20px 52px rgba(13,20,88,.2);transition:border-color .25s,box-shadow .25s}
+    .search-form:focus-within{border-color:rgba(139,92,255,.65);box-shadow:0 20px 65px rgba(65,52,180,.22),0 0 0 4px rgba(139,92,255,.06)}
+    .plus{font-size:34px;font-weight:200;color:rgba(255,255,255,.76);line-height:1;text-align:left}
+    .search-input{width:100%;border:0;outline:0;background:transparent;font-size:18px;font-weight:350;padding:0 8px;color:#fff}
+    .search-input::placeholder{color:rgba(255,255,255,.45)}
+    .submit{border:0;background:transparent;padding:10px 4px 10px 22px;color:rgba(255,255,255,.73);font-size:12px;letter-spacing:.07em;text-transform:uppercase}
+    .submit::after{content:"↗";font-size:18px;margin-left:12px}
+    .examples{position:relative;z-index:2;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:27px;opacity:0;transform:translateY(8px);pointer-events:none;transition:.45s var(--ease)}
+    .examples.show{opacity:1;transform:none;pointer-events:auto}
+    .examples button{border:1px solid rgba(255,255,255,.13);border-radius:999px;background:rgba(9,9,12,.72);padding:9px 14px;font-size:10px;color:rgba(255,255,255,.58)}
+    .status{position:relative;z-index:2;height:22px;margin-top:17px;font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+    .menu{display:none}
+    @media(max-width:720px){
+      .header{height:74px;padding:0 20px;grid-template-columns:1fr auto 1fr;background:#08090d}
+      .brand{width:94px}.header-nav a{display:none}.header-nav{gap:0}.header-nav .bird{width:27px;height:23px}.lang{display:none}
+      .menu{display:flex;justify-self:end;width:24px;height:18px;flex-direction:column;justify-content:space-between;border:0;padding:2px 0;background:none}.menu span{width:100%;height:1px;background:#fff}
+      main{padding:104px 18px 48px;align-items:center}
+      .search-stage{width:100%}.intro-shell{width:min(100%,430px);padding:14px}.intro-card{min-height:350px;padding:54px 32px 46px}
+      .bird-mark{width:64px;height:48px;margin-bottom:29px}h1{font-size:30px}.intro-card p{font-size:15px}
+      .search-form{width:100%;height:64px;padding:0 17px;grid-template-columns:42px 1fr auto}.plus{font-size:29px}.search-input{font-size:15px}.submit{font-size:0;padding-left:10px}.submit::after{font-size:20px;margin-left:0}
+    }
+    @media(max-height:700px){main{padding-top:90px}.intro-card{min-height:300px;padding-top:38px;padding-bottom:36px}.bird-mark{margin-bottom:20px}}
+    @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <header class="header">
+    <a class="brand" href="index.html" aria-label="返回版本選擇"><img src="assets/embedded-7d630d246b0b.png" alt="豪華朗機工 LuxuryLogico"></a>
+    <nav class="header-nav" aria-label="主要選單"><a href="left.html">Works</a><img class="bird" src="assets/embedded-cacb32ca5c6c.png" alt="天氣鳥搜尋"><a href="organization.html">About</a></nav>
+    <div class="lang">CN / EN</div>
+    <button class="menu" type="button" aria-label="選單"><span></span><span></span></button>
+  </header>
+  <main>
+    <section class="search-stage" aria-labelledby="searchTitle">
+      <div class="intro-shell"><div class="intro-card">
+        <div class="bird-mark"><img src="assets/embedded-cacb32ca5c6c.png" alt="天氣鳥"><span class="spark"></span></div>
+        <h1 id="searchTitle">Hi，我是天氣鳥</h1>
+        <p>有什麼想探索的嗎？<br>我可以幫你找作品、推薦靈感，<br>或帶你看看相關內容。</p>
+      </div></div>
+      <form class="search-form" id="searchForm"><span class="plus" aria-hidden="true">＋</span><label class="sr-only" for="searchInput"></label><input class="search-input" id="searchInput" autocomplete="off" placeholder="問問天氣鳥" aria-label="輸入想搜尋的內容"><button class="submit" type="submit">探索</button></form>
+      <div class="examples" id="examples"><button type="button">推薦互動裝置作品</button><button type="button">探索光與聲音</button><button type="button">找公共藝術</button></div>
+      <div class="status" id="status" aria-live="polite"></div>
+    </section>
+  </main>
+  <script>
+    const form=document.getElementById('searchForm'),input=document.getElementById('searchInput'),status=document.getElementById('status'),examples=document.getElementById('examples');
+    function search(text){if(!text.trim()){input.focus();return}status.textContent='天氣鳥正在整理「'+text.trim()+'」的相關內容…';examples.classList.remove('show');setTimeout(()=>{status.textContent='可以從這些方向繼續探索';examples.classList.add('show')},650)}
+    form.addEventListener('submit',e=>{e.preventDefault();search(input.value)});
+    examples.addEventListener('click',e=>{if(e.target.matches('button')){input.value=e.target.textContent;search(input.value)}});
+  </script>
+</body>
+</html>
