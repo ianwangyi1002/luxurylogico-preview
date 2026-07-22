@@ -14,11 +14,11 @@
     body{min-height:100svh;overflow-x:hidden;background:radial-gradient(ellipse 55% 48% at 50% 67%,rgba(47,63,168,.24),transparent 70%),#090a0e}
     button,input{font:inherit;color:inherit}
     button{cursor:pointer}
-    .header{position:fixed;z-index:20;inset:0 0 auto;height:88px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 clamp(26px,4vw,68px);background:linear-gradient(#08090e 34%,rgba(8,9,14,.75) 68%,transparent)}
-    .brand{width:166px}.brand img{display:block;width:100%;height:auto}
-    .header-nav{display:flex;align-items:center;gap:38px;font-size:12px;color:rgba(255,255,255,.7)}
-    .header-nav a{color:inherit;text-decoration:none}.header-nav .bird{width:38px;height:29px;object-fit:contain;filter:brightness(1.25)}
-    .lang{justify-self:end;font-size:10px;color:var(--muted);letter-spacing:.08em}
+    .header{position:fixed;z-index:20;inset:0 0 auto;height:76px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:40px 56px 0 60px;background:linear-gradient(#08090e 34%,rgba(8,9,14,.75) 68%,transparent)}
+    .brand{width:98px}.brand img{display:block;width:100%;height:auto}
+    .header-nav{display:flex;align-items:center;gap:38px;font-size:16px;font-weight:200;color:#fff}
+    .header-nav a{color:inherit;text-decoration:none}.header-nav .bird{width:47px;height:33px;object-fit:contain}
+    .lang{justify-self:end;font-size:14px;font-weight:300;color:#fff}
     .back{display:none}
     main{min-height:100svh;display:grid;place-items:center;padding:130px 24px 80px}
     .search-stage{width:min(900px,100%);display:flex;flex-direction:column;align-items:center;position:relative}
@@ -44,9 +44,9 @@
     .status{position:relative;z-index:2;height:22px;margin-top:17px;font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
     .menu{display:none}
     @media(max-width:720px){
-      .header{height:74px;padding:0 20px;grid-template-columns:1fr auto 1fr;background:#08090d}
-      .brand{width:94px}.header-nav a{display:none}.header-nav{gap:0}.header-nav .bird{width:27px;height:23px}.lang{display:none}
-      .menu{display:flex;justify-self:end;width:24px;height:18px;flex-direction:column;justify-content:space-between;border:0;padding:2px 0;background:none}.menu span{width:100%;height:1px;background:#fff}
+      .header{height:76px;padding:52px 16px 0 19px;grid-template-columns:1fr auto 1fr;background:#08090d}
+      .brand{width:67.2px}.header-nav a{display:none}.header-nav{gap:0}.header-nav .bird{width:24px;height:17px}.lang{display:none}
+      .menu{display:flex;justify-self:end;width:14px;height:7px;flex-direction:column;justify-content:space-between;border:0;padding:0;background:none}.menu span{width:100%;height:1px;background:#fff}
       main{padding:104px 18px 48px;align-items:center}
       .search-stage{width:100%}.intro-shell{width:min(100%,430px);padding:14px}.intro-card{min-height:330px;padding:50px 28px 42px}
       .bird-mark{width:64px;height:48px;margin-bottom:26px}h1{font-size:27px}.intro-card p{font-size:13px}
@@ -55,12 +55,13 @@
     @media(max-height:700px){main{padding-top:90px}.intro-card{min-height:300px;padding-top:38px;padding-bottom:36px}.bird-mark{margin-bottom:20px}}
     @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
   </style>
+<link rel="stylesheet" href="light-theme.css">
 </head>
 <body>
   <header class="header">
     <a class="brand" href="index.html" aria-label="返回版本選擇"><img src="embedded-7d630d246b0b.png" alt="豪華朗機工 LuxuryLogico"></a>
     <nav class="header-nav" aria-label="主要選單"><a href="left.html">Works</a><img class="bird" src="embedded-cacb32ca5c6c.png" alt="天氣鳥搜尋"><a href="organization.html">About</a></nav>
-    <div class="lang">CN / EN</div>
+    <div class="lang">中／EN</div>
     <button class="menu" type="button" aria-label="選單"><span></span><span></span></button>
   </header>
   <main>
@@ -87,5 +88,6 @@
     form.addEventListener('submit',e=>{e.preventDefault();search(input.value)});
     examples.addEventListener('click',e=>{if(e.target.matches('button')){input.value=e.target.textContent;search(input.value)}});
   </script>
+  <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
 </body>
 </html>

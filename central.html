@@ -8,11 +8,11 @@
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050505;color:#f4f4f4;font-family:Arial,"Noto Sans TC",sans-serif}
 body{position:relative}
-header{position:fixed;inset:0 0 auto;height:90px;display:flex;align-items:center;justify-content:space-between;padding:0 3.5vw;z-index:50;background:linear-gradient(#000e,#0000)}
-.brand{display:flex;align-items:center}.brand img{width:118px;height:auto;display:block}
-nav{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:46px;align-items:center;font-size:13px}
-.nav-bird{width:54px;height:54px;object-fit:contain;cursor:pointer}
-.language{font-size:11px}
+header{position:fixed;inset:0 0 auto;height:76px;display:flex;align-items:center;justify-content:space-between;padding:40px 56px 0 60px;z-index:50;background:linear-gradient(#000e,#0000)}
+.brand{display:flex;align-items:center}.brand img{width:98px;height:auto;display:block}
+nav{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:38px;align-items:center;font-size:16px;font-weight:200}
+.nav-bird{width:47px;height:33px;object-fit:contain;cursor:pointer}
+.language{font-size:14px;font-weight:300}
 main{width:100%;height:100vh;position:relative;display:flex;align-items:center}
 .project-info{position:absolute;left:50%;top:17vh;transform:translateX(-50%);width:min(70vw,900px);z-index:10;text-align:center;font-family:Arial,"Noto Sans TC",sans-serif;pointer-events:none}
 .project-number{display:block;font-size:12px;font-weight:500;letter-spacing:.08em;line-height:1;margin:0 0 12px;opacity:.72;transition:opacity .18s ease,transform .18s ease}.project-info h1{font-size:16px;font-weight:500;letter-spacing:.08em;line-height:1.4;margin:0;transition:opacity .18s ease,transform .18s ease}.project-info.changing h1,.project-info.changing .project-number{opacity:0;transform:translateY(5px)}
@@ -46,16 +46,16 @@ main{width:100%;height:100vh;position:relative;display:flex;align-items:center}
 .hint{position:fixed;left:50%;bottom:3.2vh;transform:translateX(-50%);font-size:11px;letter-spacing:.08em;opacity:.38}
 .mobile-menu-button,.mobile-menu-panel{display:none}
 @media(max-width:800px){
-  header{height:76px;padding:0 20px;background:linear-gradient(#000 58%,#0000)}
-  .brand img{width:92px}
+  header{height:76px;padding:52px 16px 0 19px;background:linear-gradient(#000 58%,#0000)}
+  .brand img{width:67.2px}
   nav{left:50%;gap:0}
   nav span{display:none}
-  .nav-bird{width:25px;height:25px}
+  .nav-bird{width:24px;height:17px}
   .language{display:none}
-  .mobile-menu-button{display:flex;position:absolute;right:20px;top:31px;width:18px;height:14px;padding:0;border:0;background:transparent;flex-direction:column;justify-content:space-between;z-index:72}
+  .mobile-menu-button{display:flex;position:absolute;right:16px;top:61px;width:14px;height:7px;padding:0;border:0;background:transparent;flex-direction:column;justify-content:space-between;z-index:72}
   .mobile-menu-button span{display:block;width:100%;height:1px;background:#fff;transition:.25s ease}
-  .mobile-menu-button.open span:first-child{transform:translateY(6.5px) rotate(45deg)}
-  .mobile-menu-button.open span:last-child{transform:translateY(-6.5px) rotate(-45deg)}
+  .mobile-menu-button.open span:first-child{transform:translateY(3px) rotate(45deg)}
+  .mobile-menu-button.open span:last-child{transform:translateY(-3px) rotate(-45deg)}
   .mobile-menu-panel{display:flex;position:fixed;top:0;right:0;width:100%;height:100svh;padding:106px 24px 36px;background:rgba(5,5,5,.97);z-index:60;flex-direction:column;gap:26px;opacity:0;pointer-events:none;transform:translateY(-12px);transition:.25s ease}
   .mobile-menu-panel.open{opacity:1;pointer-events:auto;transform:none}
   .mobile-menu-panel a{color:#fff;text-decoration:none;font-size:26px;font-weight:400;letter-spacing:-.02em}
@@ -144,12 +144,13 @@ z-index:30;
 }
 
 </style>
+<link rel="stylesheet" href="light-theme.css">
 </head>
 <body>
 <header>
   <div class="brand"><img src="embedded-7d630d246b0b.png" alt="豪華朗機工 LuxuryLogico"></div>
   <nav><span>Works</span><img class="nav-bird" src="embedded-cacb32ca5c6c.png" alt="天氣鳥"><span>About</span></nav>
-  <div class="language">CN / EN</div>
+  <div class="language">中／EN</div>
   <button class="mobile-menu-button" id="mobileMenuButton" aria-label="開啟選單" aria-expanded="false"><span></span><span></span></button>
 </header>
 
